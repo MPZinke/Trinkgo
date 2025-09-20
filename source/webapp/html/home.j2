@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Trinkgo</title>
+	</head>
+	<body>
+		<h1>Spotify Web Playback SDK Quick Start</h1>
+		<iframe style="border-radius:12px" src="https://open.spotify.com/embed/" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+		<button
+			onclick="play(this);"
+		>
+			Play
+		</button>
+		<script src="https://sdk.scdn.co/spotify-player.js"></script>
+		<!-- <script src="https://open.spotify.com/embed/iframe-api/v1" async></script> -->
+		<div id="embed-iframe"></div>
+
+
+<script>
+	let is_playing = false;
+	let is_active = false;
+	let track = '';
+
+
+	var player = "player-test";
+	var player_device_id = "player_device_id-test";
+
+
+	function play(button)
+	{
+		button.innerHTML = "Pause";
+		console.log(player);
+		console.log(player_device_id);
+		// player.togglePlay();
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("PUT", `https://api.spotify.com/v1/me/player/play?device_id=${player_device_id}`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.setRequestHeader("Authorization", `Bearer BQBqbwqVKQhMQN2Q1QZk2hL307DgUtKJxgEh_T-LWcnu4PCK-4O4A31TcSNRZHtlbCvB7X0HgeyiTD8hjcnVl1disZ3XtMFBLmen1Zj6xoAdbC7K4dCRhNYPPb-WQ7z4qK4xKlZoPVY0yaGPOeRaTXEZokcxknhqlxq40n2Qnh-YN6eg21pUUTYImhRuijDYH24MsMJzK7AHCpISKTcrC9c5T57284OiKjmeIn3jOn_O-YWdyoGzWZPhcBfIUTkNyFANWyGzP8Bv3w`);
+
+		xmlhttp.send(
+			JSON.stringify(
+				{
+					context_uri: "spotify:playlist:49PAThhKRCCTXeydvq9uAp",
+				}
+			)
+		);
+		if(xmlhttp.status == 400)
+		{
+			return alert("400: "+xmlhttp.responseText);
+		}
+		else if(xmlhttp.status != 200)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
+
+		console.log("Playing?");
+		console.log(player.getCurrentState())
+	}
+
+
+	function onSpotifyWebPlaybackSDKReady()
+	{
+		console.log("READY with player");
+		console.log(player);
+		const token = `BQBqbwqVKQhMQN2Q1QZk2hL307DgUtKJxgEh_T-LWcnu4PCK-4O4A31TcSNRZHtlbCvB7X0HgeyiTD8hjcnVl1disZ3XtMFBLmen1Zj6xoAdbC7K4dCRhNYPPb-WQ7z4qK4xKlZoPVY0yaGPOeRaTXEZokcxknhqlxq40n2Qnh-YN6eg21pUUTYImhRuijDYH24MsMJzK7AHCpISKTcrC9c5T57284OiKjmeIn3jOn_O-YWdyoGzWZPhcBfIUTkNyFANWyGzP8Bv3w`;
+		player = new window.Spotify.Player({
+			name: 'trinkgo',
+			getOAuthToken: cb => { cb(token); },
+			volume: 0.5,
+		});
+
+		console.log(player);
+
+		player.addListener('ready', ({ device_id }) => {
+			player_device_id = device_id;
+			console.log('Ready with Device ID', device_id);
+		});
+
+		// Not Ready
+		player.addListener('not_ready', ({ device_id }) => {
+			console.log('Device ID has gone offline', device_id);
+		});
+
+		player.addListener('player_state_changed', ( player_state_changed_state => {
+
+			if (!player_state_changed_state) {
+				console.log("NOPE");
+				return;
+			}
+
+			track = player_state_changed_state.track_window.current_track;
+			is_playing = player_state_changed_state.paused;
+
+			player.getCurrentState().then( state => { 
+				console.log(`State ${state}`)
+				is_active = state;
+			});
+
+		}));
+
+		console.log(player.connect().then( s => {console.log(`s: ${s}`); player.togglePlay();}));
+	}
+
+	window.onSpotifyWebPlaybackSDKReady = onSpotifyWebPlaybackSDKReady;
+
+
+		// Ready
+</script>
+
+	</body>
+</html>

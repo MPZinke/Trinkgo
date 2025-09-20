@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<a
+		href="https://accounts.spotify.com/api/token"
+		method="POST"
+	>
+</html>
+<script>
+	console.log("1");
+	function on_spotify_web_playback_SDK_ready()
+	{
+		console.log("2");
+		const urlParams = new URLSearchParams(window.location.search);
+		let code = urlParams.get('code');
+		let auth = "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=";
+		console.log(code)
+
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("POST", "https://accounts.spotify.com/api/token", false);
+		xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlhttp.setRequestHeader("Authorization", auth);
+
+		xmlhttp.send(
+			new URLSearchParams(
+				{
+					// client_id: "8dc7f8b757934d9ebaf39f9347bccc56",
+					grant_type: 'authorization_code',
+					code: code,
+					redirect_uri: "http://127.0.0.1:8080/authenticated",
+					// code_verifier: window.localStorage.getItem('code_verifier'),
+				}
+			)
+		);
+		if(xmlhttp.status == 400)
+		{
+			return alert("400: "+xmlhttp.responseText);
+		}
+		else if(xmlhttp.status != 200)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
+
+		let response_body = JSON.stringify(xmlhttp.responseText);
+		alert(xmlhttp.responseText);
+		console.log("Success: "+response_body);
+		localStorage.setItem('access_token', response_body.access_token);
+	}
+
+
+	console.log("4");
+	on_spotify_web_playback_SDK_ready();
+	console.log("5");
+</script>
