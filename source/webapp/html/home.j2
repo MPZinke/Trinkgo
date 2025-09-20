@@ -17,6 +17,13 @@
 
 
 <script>
+	var token = "{{ bearer_token }}";
+	// if(token === undefined)
+	// {
+	// 	window.location.href = "/authenticate";
+	// }
+	console.log(token);
+
 	let is_playing = false;
 	let is_active = false;
 	let track = '';
@@ -27,6 +34,10 @@
 
 
 	function play(button)
+	/*
+	FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
+	 AND: https://stackoverflow.com/questions/68047533/spotify-web-api-how-to-play-a-playlist
+	*/
 	{
 		button.innerHTML = "Pause";
 		console.log(player);
@@ -35,7 +46,7 @@
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("PUT", `https://api.spotify.com/v1/me/player/play?device_id=${player_device_id}`, false);
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.setRequestHeader("Authorization", `Bearer BQBqbwqVKQhMQN2Q1QZk2hL307DgUtKJxgEh_T-LWcnu4PCK-4O4A31TcSNRZHtlbCvB7X0HgeyiTD8hjcnVl1disZ3XtMFBLmen1Zj6xoAdbC7K4dCRhNYPPb-WQ7z4qK4xKlZoPVY0yaGPOeRaTXEZokcxknhqlxq40n2Qnh-YN6eg21pUUTYImhRuijDYH24MsMJzK7AHCpISKTcrC9c5T57284OiKjmeIn3jOn_O-YWdyoGzWZPhcBfIUTkNyFANWyGzP8Bv3w`);
+		xmlhttp.setRequestHeader("Authorization", `Bearer ${token}`);
 
 		xmlhttp.send(
 			JSON.stringify(
@@ -62,7 +73,7 @@
 	{
 		console.log("READY with player");
 		console.log(player);
-		const token = `BQBqbwqVKQhMQN2Q1QZk2hL307DgUtKJxgEh_T-LWcnu4PCK-4O4A31TcSNRZHtlbCvB7X0HgeyiTD8hjcnVl1disZ3XtMFBLmen1Zj6xoAdbC7K4dCRhNYPPb-WQ7z4qK4xKlZoPVY0yaGPOeRaTXEZokcxknhqlxq40n2Qnh-YN6eg21pUUTYImhRuijDYH24MsMJzK7AHCpISKTcrC9c5T57284OiKjmeIn3jOn_O-YWdyoGzWZPhcBfIUTkNyFANWyGzP8Bv3w`;
+		// const token = `BQCO2MGJYv9MBtkSiGZIS917gIbSPe_SODf4ozcXiyW3Iosxx28vguZBAEkCLL-wJacozg7RWcv8x6srLy0vY-r3Pn4-UnK2T2rKqfejQ25rxx3iQMZg_Kz-55uRR7Za7-nj2rzwdx2m7hOsmkNCQHUT2krLi2LFsEw6Z83sy6GikWDp3FXA17Oy2MFcnBmqZNFxcZoio1-_WCrNxMVgM2QCsEvNjsiMmetSedixVFatWeee-_V7fv5GfCvV6M06htFl8fsy6iwBow`;
 		player = new window.Spotify.Player({
 			name: 'trinkgo',
 			getOAuthToken: cb => { cb(token); },

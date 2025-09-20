@@ -7,14 +7,6 @@
 	}
 
 
-	function sha256(plain)
-	{
-		const encoder = new TextEncoder()
-		const data = encoder.encode(plain)
-		return window.crypto.subtle.digest('SHA-256', data)
-	}
-
-
 	function base64encode(input)
 	{
 		var str = "";
@@ -32,28 +24,15 @@
 
 	function get_auth_token()
 	{
-		const codeVerifier  = base64encode(generateRandomString(64));
-
-		const hashed = sha256(base64encode(codeVerifier));
-		const codeChallenge = base64encode(hashed);
-		const clientId = '8dc7f8b757934d9ebaf39f9347bccc56';
-
-		const redirectUri = 'http://127.0.0.1:8080/authenticated';
-
-		const scope = 'user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private';
-		const authUrl = new URL("https://accounts.spotify.com/authorize")
-
-		// generated in the previous step
-		window.localStorage.setItem('code_verifier', codeVerifier);
-
 		const params =  {
-			response_type: 'code',
-			client_id: clientId,
-			scope,
-			state: codeVerifier,
-			redirect_uri: redirectUri,
+			response_type: "code",
+			client_id: "8dc7f8b757934d9ebaf39f9347bccc56",
+			scope: "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
+			state: base64encode(generateRandomString(64)),
+			redirect_uri: "http://127.0.0.1:8080/authenticated",
 		}
 
+		const authUrl = new URL("https://accounts.spotify.com/authorize")
 		authUrl.search = new URLSearchParams(params).toString();
 		window.location.href = authUrl.toString();
 	}
