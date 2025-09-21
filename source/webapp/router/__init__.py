@@ -14,20 +14,27 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
+import base64
 from pathlib import Path
+import random
+import string
+import urllib.parse
 
 
 from flask import redirect, render_template, request, Flask
 import requests
 
 
+import spotify
+from spotify.classes import Player, Song
+
+
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
 HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
 STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
-print(HTML_DIRECTORY)
 
-BEARER_TOKEN = None
+PLAYER = Player()
 
 
 app = Flask("Catan", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
@@ -35,14 +42,24 @@ app = Flask("Catan", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECT
 
 @app.route("/authenticate")
 def authenticate():
-	return render_template("authenticate.j2")
+	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
+	#    @: Request User Authorization
+	params = {
+		"response_type": "code",
+		"client_id": "8dc7f8b757934d9ebaf39f9347bccc56",
+		"scope": "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
+		"state": "",
+		"redirect_uri": "http://127.0.0.1:8080/authenticated",
+	}
+	param_string = urllib.parse.urlencode(params)
 
+	return redirect(f"https://accounts.spotify.com/authorize?{param_string}")
 
 
 @app.route("/authenticated")
 def authenticated():
-	global BEARER_TOKEN
-
+	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
+	#    @: Request Access Token
 	code = request.args.get("code")
 	if(code is None):
 		raise Exception("URL parameter `code` is missing.")
@@ -58,14 +75,37 @@ def authenticated():
 		"redirect_uri": "http://127.0.0.1:8080/authenticated",
 	}
 	response = requests.post(url, headers=headers, params=params)
-	BEARER_TOKEN = response.json().get("access_token")
+
+	print(response.json())
+
+	PLAYER.access_token = response.json().get("access_token")
+	PLAYER.refresh_token = response.json().get("refresh_token")
 	return redirect("/home")
 
 
 @app.get("/")
 @app.get("/home")
 def GET_home():
-	if BEARER_TOKEN is None:
+	if PLAYER.access_token is None:
 		return redirect("/authenticate")
 
-	return render_template("home.j2", bearer_token=BEARER_TOKEN)
+	return render_template("home.j2", access_token=PLAYER.access_token)
+
+
+@app.post("/api/device_id")
+def POST_device_id():
+	PLAYER.device_id = request.json.get("device_id")
+	return ("", 204)
+
+
+@app.get("/api/play")
+def api_play():
+	song = Song("5ChkMS8OtdzJeqyybCc9R5", "Billie Jean", 60_000)
+	spotify.requests.play_song(PLAYER, song)
+	return ("", 204)
+
+
+@app.get("/api/pause")
+def api_pause():
+	spotify.requests.pause(PLAYER)
+	return ("", 204)

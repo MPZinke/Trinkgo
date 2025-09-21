@@ -5,7 +5,6 @@
 	</head>
 	<body>
 		<h1>Spotify Web Playback SDK Quick Start</h1>
-		<iframe style="border-radius:12px" src="https://open.spotify.com/embed/" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 		<button
 			onclick="play(this);"
 		>
@@ -17,11 +16,7 @@
 
 
 <script>
-	var token = "{{ bearer_token }}";
-	// if(token === undefined)
-	// {
-	// 	window.location.href = "/authenticate";
-	// }
+	var token = "{{ access_token }}";
 	console.log(token);
 
 	let is_playing = false;
@@ -33,83 +28,71 @@
 	var player_device_id = "player_device_id-test";
 
 
-	function play(button)
-	/*
-	FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
-	 AND: https://stackoverflow.com/questions/68047533/spotify-web-api-how-to-play-a-playlist
-	*/
+	function send_device_id(device_id)
 	{
-		button.innerHTML = "Pause";
-		console.log(player);
-		console.log(player_device_id);
-		// player.togglePlay();
 		var xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("PUT", `https://api.spotify.com/v1/me/player/play?device_id=${player_device_id}`, false);
+		xmlhttp.open("POST", `/api/device_id`, false);
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.setRequestHeader("Authorization", `Bearer ${token}`);
+		xmlhttp.send(`{"device_id": "${device_id}"}`);
 
-		xmlhttp.send(
-			JSON.stringify(
-				{
-					context_uri: "spotify:playlist:49PAThhKRCCTXeydvq9uAp",
-				}
-			)
-		);
-		if(xmlhttp.status == 400)
+		if(xmlhttp.status != 204)
 		{
-			return alert("400: "+xmlhttp.responseText);
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
 		}
-		else if(xmlhttp.status != 200)
+	}
+
+
+	function play(button)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET", `/api/play`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.send();
+
+		if(xmlhttp.status != 204)
 		{
 			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
 		}
 
-		console.log("Playing?");
-		console.log(player.getCurrentState())
+		button.innerHTML = "Pause";
+		button.onclick = function() { pause(button) };
+	}
+
+
+	function pause(button)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET", `/api/pause`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.send();
+
+		if(xmlhttp.status != 204)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
+
+		button.innerHTML = "Play";
+		button.onclick = function() { play(button) };
 	}
 
 
 	function onSpotifyWebPlaybackSDKReady()
 	{
-		console.log("READY with player");
-		console.log(player);
-		// const token = `BQCO2MGJYv9MBtkSiGZIS917gIbSPe_SODf4ozcXiyW3Iosxx28vguZBAEkCLL-wJacozg7RWcv8x6srLy0vY-r3Pn4-UnK2T2rKqfejQ25rxx3iQMZg_Kz-55uRR7Za7-nj2rzwdx2m7hOsmkNCQHUT2krLi2LFsEw6Z83sy6GikWDp3FXA17Oy2MFcnBmqZNFxcZoio1-_WCrNxMVgM2QCsEvNjsiMmetSedixVFatWeee-_V7fv5GfCvV6M06htFl8fsy6iwBow`;
 		player = new window.Spotify.Player({
 			name: 'trinkgo',
 			getOAuthToken: cb => { cb(token); },
 			volume: 0.5,
 		});
 
-		console.log(player);
-
 		player.addListener('ready', ({ device_id }) => {
-			player_device_id = device_id;
-			console.log('Ready with Device ID', device_id);
+			send_device_id(device_id);
 		});
 
-		// Not Ready
 		player.addListener('not_ready', ({ device_id }) => {
-			console.log('Device ID has gone offline', device_id);
+			alert('Device ID has gone offline', device_id);
 		});
 
-		player.addListener('player_state_changed', ( player_state_changed_state => {
-
-			if (!player_state_changed_state) {
-				console.log("NOPE");
-				return;
-			}
-
-			track = player_state_changed_state.track_window.current_track;
-			is_playing = player_state_changed_state.paused;
-
-			player.getCurrentState().then( state => { 
-				console.log(`State ${state}`)
-				is_active = state;
-			});
-
-		}));
-
-		console.log(player.connect().then( s => {console.log(`s: ${s}`); player.togglePlay();}));
+		player.connect();
 	}
 
 	window.onSpotifyWebPlaybackSDKReady = onSpotifyWebPlaybackSDKReady;

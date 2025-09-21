@@ -34,7 +34,8 @@
 
 		const authUrl = new URL("https://accounts.spotify.com/authorize")
 		authUrl.search = new URLSearchParams(params).toString();
-		window.location.href = authUrl.toString();
+		console.log(authUrl.toString());
+		//window.location.href = authUrl.toString();
 	}
 
 
