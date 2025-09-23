@@ -1,28 +1,25 @@
 
 
-DROP TABLE "Playlists" IF EXISTS;
+DROP TABLE IF EXISTS "Playlists" CASCADE;
 CREATE TABLE "Playlists"
 (
-	"id" SERIAL NOT NULL PRIMARY KEY,
-	"name" VARCHAR(100) NOT NULL,
-	"url" TEXT NOT NULL,
-	"is_deleted" BOOL NOT NULL
+	"id" CHAR(22) NOT NULL PRIMARY KEY,
+	"name" TEXT NOT NULL,
+	"is_deleted" BOOL NOT NULL DEFAULT FALSE
 );
 
 
-
-DROP TABLE "Songs" IF EXISTS;
+DROP TABLE IF EXISTS "Songs" CASCADE;
 CREATE TABLE "Songs"
 (
-	"id" SERIAL NOT NULL PRIMARY KEY,
-	"name" VARCHAR(100),
-	"url" TEXT NOT NULL,
+	"id" CHAR(22) NOT NULL PRIMARY KEY,
+	"name" TEXT NOT NULL,
+	"album" TEXT NOT NULL,
+	"artists" TEXT NOT NULL,
+	"artwork" TEXT DEFAULT NULL,
 	"start" INT NOT NULL DEFAULT 0,
 	"duration" INT NOT NULL DEFAULT 0,
-	"is_deleted" BOOL NOT NULL,
-	"Playlists.id" INT NOT NULL,
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists"("id")
+	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
+	"Playlists.id" CHAR(22) NOT NULL,
+	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id")
 );
-
-
-

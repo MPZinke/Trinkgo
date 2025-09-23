@@ -14,10 +14,50 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
+from flask import redirect
 import requests
 
 
 from spotify.classes import Playlist, Song, Player
+
+
+def play_previous(player: Player):
+	# FROM: https://developer.spotify.com/documentation/web-api/reference/skip-users-playback-to-previous-track
+	url = f"https://api.spotify.com/v1/me/player/previous?device_id={player.device_id}"
+	headers = {
+		"Content-Type": "application/json",
+		"Authorization": f"Bearer {player.access_token}"
+	}
+	response: requests.Response = requests.post(url, headers=headers)
+	response.raise_for_status()
+	return response.status_code != 204
+
+
+def play_playlist(player: Player, playlist: Playlist):
+	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
+	#  AND: https://stackoverflow.com/questions/68047533/spotify-web-api-how-to-play-a-playlist
+	url = f"https://api.spotify.com/v1/me/player/play?device_id={player.device_id}"
+	headers = {
+		"Content-Type": "application/json",
+		"Authorization": f"Bearer {player.access_token}"
+	}
+	body = {"context_uri": f"spotify:playlist:{playlist.id}", "offset": {"position": 11}}
+	response: requests.Response = requests.put(url, headers=headers, json=body)
+	response.raise_for_status()
+	return response.status_code != 204
+
+
+def play_song(player: Player, song: Song):
+	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
+	url = f"https://api.spotify.com/v1/me/player/play?device_id={player.device_id}"
+	headers = {
+		"Content-Type": "application/json",
+		"Authorization": f"Bearer {player.access_token}"
+	}
+	body = {"uris": [f"spotify:track:{song.id}"], "position_ms": song.position}
+	response: requests.Response = requests.put(url, headers=headers, json=body)
+	response.raise_for_status()
+	return response.status_code != 204
 
 
 def pause(player: Player):
@@ -32,70 +72,89 @@ def pause(player: Player):
 	return response.status_code != 204
 
 
-def play_playlist(player: Player, playlist: Playlist):
-	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
-	#  AND: https://stackoverflow.com/questions/68047533/spotify-web-api-how-to-play-a-playlist
-	url = f"https://api.spotify.com/v1/me/player/play?device_id={player.device_id}"
+def play_next(player: Player):
+	# FROM: https://developer.spotify.com/documentation/web-api/reference/skip-users-playback-to-next-track
+	url = f"https://api.spotify.com/v1/me/player/next?device_id={player.device_id}"
 	headers = {
 		"Content-Type": "application/json",
 		"Authorization": f"Bearer {player.access_token}"
 	}
-	body = {"context_uri": f"spotify:playlist:{playlist.id}"}
-	response: requests.Response = requests.put(url, headers=headers, json=body)
+	response: requests.Response = requests.post(url, headers=headers)
+	response.raise_for_status()
 	return response.status_code != 204
 
 
-def play_song(player: Player, song: Song):
-	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
-	url = f"https://api.spotify.com/v1/me/player/play?device_id={player.device_id}"
+def get_access_token(player: Player, code: str):
+	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
+	#    @: Request Access Token
+	url = "https://accounts.spotify.com/api/token"
 	headers = {
-		"Content-Type": "application/json",
-		"Authorization": f"Bearer {player.access_token}"
+		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+		"Content-Type": "application/x-www-form-urlencoded",
 	}
-	body = {"uris": [f"spotify:track:{song.id}"], "position_ms": song.position}
-	# body = {"context_uri": f"spotify:track:{song.id}"}
-	response: requests.Response = requests.put(url, headers=headers, json=body)
-	return response.status_code != 204
+	params = {
+		"code": code,
+		"grant_type": "authorization_code",
+		"redirect_uri": "http://127.0.0.1:8080/authenticated",
+	}
+	response = requests.post(url, headers=headers, params=params)
+
+	print(response.json())  # TEMP
+
+	response_json = response.json()
+	player.access_token = response_json.get("access_token")
+	player.refresh_token = response_json.get("refresh_token")
+	player.expires_in = response_json.get("expires_in")
 
 
-def refresh_access_token(refresh_token: str):
+def refresh_access_token(player: Player):
 	# FROM: https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
 	url = "https://accounts.spotify.com/api/token"
-	headers = {"Content-Type": "application/x-www-form-urlencoded"}
+	headers = {
+		"Content-Type": "application/x-www-form-urlencoded",
+		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+	}
 	params = {
-		"refresh_token": refresh_token,
 		"grant_type": "refresh_token",
-		"client_id": "8dc7f8b757934d9ebaf39f9347bccc56",
+		"refresh_token": player.refresh_token,
 	}
 	response: requests.Response = requests.post(url, headers=headers, params=params)
-	if(response.status_code != 200):
-		return None, None
-
-	return response.json().get("access_token"), response.json().get("refresh_token")
-
-
-def get_auth() -> str:
-	url = "https://accounts.spotify.com/api/token"
-	data = "grant_type=client_credentials&client_id=56e541fab6734e6090619912859410ac&client_secret=e273d962b1504139af9a520e8532a539"
-	headers = {"Content-Type": "application/x-www-form-urlencoded"}
-	response: requests.Response = requests.post(url, headers=headers, data=data)
 	response.raise_for_status()
 
-	return response.json().get("access_token")
+	response_json = response.json()
+	player.access_token = response_json.get("access_token")
+	player.expires_in = response_json.get("expires_in")
 
 
-def get_playlist(auth_token: str, playlist_id: str) -> dict|None:
-	url = f"https://api.spotify.com/v1/playlists/{playlist_id}?fields=name,tracks.items(track(name,href))"
-	headers = {"Authorization": f"Bearer {auth_token}"}
+def get_playlist(player: Player, playlist_id: str) -> Playlist:
+	url = (
+		f"https://api.spotify.com/v1/playlists/{playlist_id}"
+		"?fields=name,tracks.items(track(id,name,album.images,album.name,artists(name))"
+	)
+	headers = {"Authorization": f"Bearer {player.access_token}"}
 	response: requests.Response = requests.get(url, headers=headers)
-
-	if(response.status_code == 401):
-		return None
 	response.raise_for_status()
 
 	playlist_info = response.json()
 	songs = []
 	for song_info in playlist_info["tracks"]["items"]:
-		songs.append(Song(song_info["track"]["name"], song_info["track"]["href"]))
+		track = song_info["track"]
 
-	return Playlist(playlist_info["name"], songs)
+		artists = ", ".join(artist["name"] for artist in track["artists"])
+
+		images: list[dict] = track["album"]["images"]
+		images.sort(key=lambda image: image["width"])
+		artwork = next((image["url"] for image in images), None)
+
+		song = Song(
+			id=track["id"],
+			name=track["name"],
+			album=track["album"]["name"],
+			artists=artists,
+			artwork=artwork,
+			start=0,
+			duration=10_000,
+		)
+		songs.append(song)
+
+	return Playlist(playlist_id, playlist_info["name"], songs)

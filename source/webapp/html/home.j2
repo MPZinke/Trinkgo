@@ -4,24 +4,34 @@
 		<title>Trinkgo</title>
 	</head>
 	<body>
-		<h1>Spotify Web Playback SDK Quick Start</h1>
+		<h1>Trinkgo</h1>
+		<script src="https://sdk.scdn.co/spotify-player.js"></script>
 		<button
+			id="previous-button"
+			onclick="previous(this);"
+			disabled
+		>
+			<<
+		</button>
+		<button
+			id="play-button"
 			onclick="play(this);"
+			disabled
 		>
 			Play
 		</button>
-		<script src="https://sdk.scdn.co/spotify-player.js"></script>
-		<!-- <script src="https://open.spotify.com/embed/iframe-api/v1" async></script> -->
-		<div id="embed-iframe"></div>
-
+		<button
+			id="next-button"
+			onclick="next(this);"
+			disabled
+		>
+			>>
+		</button>
+	</body>
+</html>
 
 <script>
 	var token = "{{ access_token }}";
-	console.log(token);
-
-	let is_playing = false;
-	let is_active = false;
-	let track = '';
 
 
 	var player = "player-test";
@@ -34,6 +44,20 @@
 		xmlhttp.open("POST", `/api/device_id`, false);
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
 		xmlhttp.send(`{"device_id": "${device_id}"}`);
+
+		if(xmlhttp.status != 204)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
+	}
+
+
+	function previous(button)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET", `/api/previous`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.send();
 
 		if(xmlhttp.status != 204)
 		{
@@ -56,6 +80,20 @@
 
 		button.innerHTML = "Pause";
 		button.onclick = function() { pause(button) };
+	}
+
+
+	function next(button)
+	{
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET", `/api/next`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.send();
+
+		if(xmlhttp.status != 204)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
 	}
 
 
@@ -86,6 +124,9 @@
 
 		player.addListener('ready', ({ device_id }) => {
 			send_device_id(device_id);
+			document.getElementById("previous-button").disabled = false;
+			document.getElementById("play-button").disabled = false;
+			document.getElementById("next-button").disabled = false;
 		});
 
 		player.addListener('not_ready', ({ device_id }) => {
@@ -100,6 +141,3 @@
 
 		// Ready
 </script>
-
-	</body>
-</html>

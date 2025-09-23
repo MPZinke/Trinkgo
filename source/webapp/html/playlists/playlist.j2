@@ -1,0 +1,23 @@
+{% from "playlists/songs.j2" import render_song %}
+
+<!DOCTYPE html>
+<html>
+	<title>
+		{{ playlist.name }} Playlist
+	</title>
+	<body>
+
+
+		<a
+			href="https://open.spotify.com/track/{{ playlist.id }}"
+		>
+			Open In Spotify
+		</a>
+
+		<table>
+			{% for song in playlist.songs %}
+				{{ render_song(loop.index, song) }}
+			{% endfor %}
+		</table>
+	</body>
+</html>

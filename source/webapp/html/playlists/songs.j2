@@ -1,0 +1,22 @@
+
+{% macro render_song(index, song) %}
+	<tr>
+		<td>
+			{{ index }}
+		</td>
+		<td>
+			<img
+				src="{{ song.artwork }}"
+			>
+		</td>
+		<td>
+			<b>
+				{{ song.name }}
+			</b>
+			<br/>
+			{{ song.artists }}
+			<br/>
+			{{ song.album }}
+		</td>
+	</tr>
+{% endmacro %}
