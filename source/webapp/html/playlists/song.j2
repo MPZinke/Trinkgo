@@ -1,0 +1,51 @@
+
+{% macro render_song(index, song) %}
+	<tr>
+		<td>
+			{{ index }}
+		</td>
+		<td>
+			<img
+				src="{{ song.artwork }}"
+			>
+		</td>
+		<td>
+			<b>
+				{{ song.name }}
+			</b>
+			<br/>
+			{{ song.artists }}
+			<br/>
+			{{ song.album }}
+		</td>
+		<td>
+			<button
+				class="play-button"
+				onclick="get_start_and_play_song(this, `{{ song.id }}`)"
+			>
+				Play
+			</button>
+			@
+			<input
+				id="song_start-{{ song.id }}-input"
+				type="number"
+				value=0
+			/>
+			ms
+			for
+			<input
+				id="song_duration-{{ song.id }}-input"
+				type="number"
+				value=0
+			/>
+			ms
+		</td>
+		<td>
+			<a
+				href="/TODO"
+			>
+				Save
+			</a>
+		</td>
+	</tr>
+{% endmacro %}

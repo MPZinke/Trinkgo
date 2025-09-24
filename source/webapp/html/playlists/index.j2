@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		Playlists
+	</title>
+	<body>
+		<h1>
+			Playlists
+		</h1>
+		<table>
+			{% for playlist in playlists %}
+				<tr>
+					<td>
+						<a
+							href="/playlists/{{ playlist.id }}"
+						>
+							{{ playlist.name }}
+						</a>
+					</td>
+					<td>
+						<a
+							href="https://open.spotify.com/playlist/{{ playlist.id }}"
+						>
+							Open In Spotify
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

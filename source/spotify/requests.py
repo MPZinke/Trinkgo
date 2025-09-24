@@ -14,7 +14,6 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from flask import redirect
 import requests
 
 
@@ -41,28 +40,28 @@ def play_playlist(player: Player, playlist: Playlist):
 		"Content-Type": "application/json",
 		"Authorization": f"Bearer {player.access_token}"
 	}
-	body = {"context_uri": f"spotify:playlist:{playlist.id}", "offset": {"position": 11}}
+	body = {"context_uri": f"spotify:playlist:{playlist.id}", "offset": {"position": 24}}
 	response: requests.Response = requests.put(url, headers=headers, json=body)
 	response.raise_for_status()
 	return response.status_code != 204
 
 
-def play_song(player: Player, song: Song):
+def play_song(player: Player, player_id: str, song: Song):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
-	url = f"https://api.spotify.com/v1/me/player/play?device_id={player.device_id}"
+	url = f"https://api.spotify.com/v1/me/player/play?device_id={player_id}"
 	headers = {
 		"Content-Type": "application/json",
 		"Authorization": f"Bearer {player.access_token}"
 	}
-	body = {"uris": [f"spotify:track:{song.id}"], "position_ms": song.position}
+	body = {"uris": [f"spotify:track:{song.id}"], "position_ms": song.start}
 	response: requests.Response = requests.put(url, headers=headers, json=body)
 	response.raise_for_status()
 	return response.status_code != 204
 
 
-def pause(player: Player):
+def pause(player: Player, player_id: str):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/pause-a-users-playback
-	url = f"https://api.spotify.com/v1/me/player/pause?device_id={player.device_id}"
+	url = f"https://api.spotify.com/v1/me/player/pause?device_id={player_id}"
 	headers = {
 		"Content-Type": "application/json",
 		"Authorization": f"Bearer {player.access_token}"
@@ -129,7 +128,7 @@ def refresh_access_token(player: Player):
 def get_playlist(player: Player, playlist_id: str) -> Playlist:
 	url = (
 		f"https://api.spotify.com/v1/playlists/{playlist_id}"
-		"?fields=name,tracks.items(track(id,name,album.images,album.name,artists(name))"
+		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,artists(name))"
 	)
 	headers = {"Authorization": f"Bearer {player.access_token}"}
 	response: requests.Response = requests.get(url, headers=headers)
@@ -153,7 +152,7 @@ def get_playlist(player: Player, playlist_id: str) -> Playlist:
 			artists=artists,
 			artwork=artwork,
 			start=0,
-			duration=10_000,
+			duration=track["duration_ms"],
 		)
 		songs.append(song)
 

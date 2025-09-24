@@ -33,15 +33,15 @@ class Song:
 
 
 	@staticmethod
-	def from_dict(dictionary: dict):
+	def from_dict(song_dict: dict):
 		return Song(
-			id=dictionary["id"],
-			name=dictionary["name"],
-			album=dictionary["album"],
-			artists=dictionary["artists"],
-			artwork=dictionary["artwork"],
-			start=dictionary["start"],
-			duration=dictionary["duration"],
+			id=song_dict["id"],
+			name=song_dict["name"],
+			album=song_dict["album"],
+			artists=song_dict["artists"],
+			artwork=song_dict["artwork"],
+			start=song_dict["start"],
+			duration=song_dict["duration"],
 		)
 
 
@@ -62,6 +62,15 @@ class Playlist:
 
 	def __str__(self) -> str:
 		return json.dumps(dict(self), indent=4)
+
+
+	@staticmethod
+	def from_dict(playlist_dict: dict):
+		return Playlist(
+			id=playlist_dict["id"],
+			name=playlist_dict["name"],
+			songs=playlist_dict.get("songs", [])
+		)
 
 
 class Player:

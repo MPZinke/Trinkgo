@@ -1,4 +1,4 @@
-{% from "playlists/songs.j2" import render_song %}
+{% from "playlists/song.j2" import render_song %}
 
 <!DOCTYPE html>
 <html>
@@ -21,3 +21,33 @@
 		</table>
 	</body>
 </html>
+
+{% include("player.j2") %}
+
+<script>
+	function get_start_and_play_song(button, id)
+	{
+		var play_buttons = document.getElementsByClassName("play-button");
+		for(var x = 0; x < play_buttons.length; x++)
+		{
+			play_buttons[x].innerHTML = "Play";
+		}
+
+		button.onclick = function() { update_button_and_pause(button, id); };
+		button.innerHTML = "Pause";
+
+		let start = document.getElementById(`song_start-${id}-input`).value;
+		let duration = document.getElementById(`song_duration-${id}-input`).value;
+		PLAYER.play_song(id, start, duration);
+	}
+
+
+	function update_button_and_pause(button, id)
+	{
+		button.onclick = function() { get_start_and_play_song(button, id); };
+		button.innerHTML = "Play";
+
+		PLAYER.pause();
+	}
+
+</script>

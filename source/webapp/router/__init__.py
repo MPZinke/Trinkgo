@@ -18,6 +18,7 @@ import base64
 from pathlib import Path
 import random
 import string
+from typing import Optional
 import urllib.parse
 
 
@@ -96,9 +97,17 @@ def GET_home():
 	return render_template("home.j2", access_token=PLAYER.access_token)
 
 
+@app.get("/play")
+@authorize
+def GET_play():
+	return render_template("play.j2", access_token=PLAYER.access_token)
+
+
 @app.get("/playlists")
+@app.get("/playlists/")
 def GET_playlists():
-	...
+	playlists = database.playlist.select_playlists()
+	return render_template("playlists/index.j2", playlists=playlists)
 
 
 @app.get("/playlists/new")
@@ -120,11 +129,11 @@ def POST_playlists_new():
 
 
 @app.get("/playlists/<string:id>")
-# @authorize
+@authorize
 def GET_playlists_id(id: int):
 	playlist = database.playlist.select_playlist(id)
 
-	return render_template("playlists/playlist.j2", playlist=playlist)
+	return render_template("playlists/playlist.j2", playlist=playlist, access_token=PLAYER.access_token)
 
 
 
@@ -143,13 +152,29 @@ def api_play():
 	return ("", 204)
 
 
+@app.post("/api/play/song")
+def api_play_song():
+	request_json = request.json
+	player_id: str = request_json.get("player_id")
+	song_id: str = request_json.get("song_id")
+	start: Optional[int] = request_json.get("start")
+
+	song = database.song.select_song(song_id)
+	if(start is not None):
+		song.start = start
+
+	spotify.requests.play_song(PLAYER, player_id, song)
+	return ("", 204)
+
+
 @app.get("/api/next")
 def api_next():
 	spotify.requests.play_next(PLAYER)
 	return ("", 204)
 
 
-@app.get("/api/pause")
+@app.post("/api/pause")
 def api_pause():
-	spotify.requests.pause(PLAYER)
+	player_id: str = request.json.get("player_id")
+	spotify.requests.pause(PLAYER, player_id)
 	return ("", 204)

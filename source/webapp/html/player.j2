@@ -1,0 +1,162 @@
+
+
+
+<script
+	src="https://sdk.scdn.co/spotify-player.js"
+>
+</script>
+<script>
+	var PLAYER = null;
+
+	class Player
+	{
+		constructor(player)
+		{
+			this.id = null;
+			this.is_playing = null;
+			this.is_ready = false;
+			this.timer = null;
+
+			this.player = new window.Spotify.Player(
+				{
+					name: 'trinkgo',
+					getOAuthToken: cb => { cb("{{ access_token }}"); },
+					volume: 0.5,
+				}
+			);
+			// FROM: https://developer.spotify.com/documentation/web-playback-sdk/reference#spotifyplayeraddlistener
+			//  AND: https://developer.spotify.com/documentation/web-playback-sdk/reference#webplaybackplayer-object
+			this.player.addListener("ready", this.ready.bind(this));
+			this.player.addListener("not_ready", this.not_ready.bind(this));
+			this.player.addListener("player_state_changed", this.player_state_changed.bind(this));
+
+			this.player.connect();
+		}
+
+
+		ready(web_playback_state)
+		{
+			this.id = web_playback_state.device_id;
+			this.is_ready = true;
+		}
+
+
+		not_ready(web_playback_state)
+		{
+			this.is_ready = false;
+			alert("Player has gone offline. Please try refreshing your browser.");
+		}
+
+
+		player_state_changed(web_playback_state)
+		{
+			if(web_playback_state.paused !== false)
+			{
+				return true;
+			}
+
+			if(!this.is_playing && this.timer !== null)
+			{
+				this.timer.start();
+			}
+
+			this.is_playing = !web_playback_state.paused;
+		}
+
+
+		// —————————————————————————————————————————————————— API  —————————————————————————————————————————————————— //
+
+		play_song(id, start=null, duration=null)
+		{
+			if(this.timer !== null)
+			{
+				this.timer.cancel();
+			}
+
+			let xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("POST", `/api/play/song`, false);
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			xmlhttp.send(JSON.stringify({player_id: this.id, song_id: id, start: start}));
+
+			if(xmlhttp.status != 204)
+			{
+				return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+			}
+
+			if(duration !== null)
+			{
+				this.timer = new Timer(this, duration);
+			}
+		}
+
+
+		pause()
+		{
+			if(this.timer !== null)
+			{
+				this.timer.cancel();
+			}
+
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("POST", `/api/pause`, false);
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			xmlhttp.send(JSON.stringify({player_id: this.id}));
+
+			if(xmlhttp.status != 204)
+			{
+				return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+			}
+		}
+	}
+
+
+	class Timer
+	{
+		constructor(player, duration)
+		{
+			this.player = player;
+			this.duration = duration;
+			this.timeout = null;
+		}
+
+
+		start()
+		{
+			if(this.timeout !== null)
+			{
+				return alert("Timer already running");
+			}
+
+			// FROM: https://www.w3schools.com/jsref/met_win_settimeout.asp
+			this.timeout = setTimeout(this.on_timeout.bind(this), this.duration);
+		}
+
+
+		cancel()
+		{
+			if(this.timeout === null)
+			{
+				return alert("No timer running");
+			}
+
+			// FROM: https://www.w3schools.com/jsref/met_win_cleartimeout.asp
+			clearTimeout(this.timeout);
+			this.timer = null;
+		}
+
+
+		on_timeout()
+		{
+			this.player.timer = null;
+			this.player.pause();
+		}
+	}
+
+
+	function onSpotifyWebPlaybackSDKReady()
+	{
+		PLAYER = new Player();
+	}
+
+	window.onSpotifyWebPlaybackSDKReady = onSpotifyWebPlaybackSDKReady;
+</script>
