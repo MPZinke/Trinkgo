@@ -28,10 +28,11 @@ def insert_playlist(cursor: psycopg2.extras.RealDictCursor, playlist: Playlist):
 	cursor.execute(query, (playlist.id, playlist.name))
 
 	query = """
-		INSERT INTO "Songs" ("id", "name", "album", "artists", "artwork", "start", "Playlists.id")
-		SELECT "Temp"."id", "Temp"."name", "Temp"."album", "Temp"."artists", "Temp"."artwork", "Temp"."start", %s
-		FROM UNNEST(%s, %s, %s, %s, %s, %s) 
-		  	AS "Temp" ("id", "name", "album", "artists", "artwork", "start");
+		INSERT INTO "Songs" ("id", "name", "album", "artists", "artwork", "start", "duration", "Playlists.id")
+		SELECT "Temp"."id", "Temp"."name", "Temp"."album", "Temp"."artists", "Temp"."artwork", "Temp"."start",
+			"Temp"."duration", %s
+		FROM UNNEST(%s, %s, %s, %s, %s, %s, %s) 
+		  	AS "Temp" ("id", "name", "album", "artists", "artwork", "start", "duration");
 	"""
 
 	ids: list[str] = [song.id for song in playlist.songs]
@@ -40,8 +41,9 @@ def insert_playlist(cursor: psycopg2.extras.RealDictCursor, playlist: Playlist):
 	artists: list[str] = [song.artists for song in playlist.songs]
 	artworks: list[str] = [song.artwork for song in playlist.songs]
 	starts: list[int] = [song.start for song in playlist.songs]
+	durations: list[int] = [song.duration for song in playlist.songs]
 
-	cursor.execute(query, (playlist.id, ids, names, albums, artists, artworks, starts,))
+	cursor.execute(query, (playlist.id, ids, names, albums, artists, artworks, starts, durations))
 
 
 @connect

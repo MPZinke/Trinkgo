@@ -6,7 +6,8 @@ from typing import Optional
 
 
 class Song:
-	def __init__(self, id: str, name: str, album: str, artists: str, artwork: str, start: int, duration: int):
+	def __init__(self, playlist_id: str, id: str, name: str, album: str, artists: str, artwork: str, start: int, duration: int):
+		self.playlist_id: str = playlist_id
 		self.id: str = id
 		self.name: str = name
 		self.album: str = album
@@ -18,6 +19,7 @@ class Song:
 
 	def __iter__(self):
 		yield from {
+			"playlist_id": self.playlist_id,
 			"id": self.id,
 			"name": self.name,
 			"album": self.album,
@@ -35,6 +37,7 @@ class Song:
 	@staticmethod
 	def from_dict(song_dict: dict):
 		return Song(
+			playlist_id=song_dict["Playlists.id"],
 			id=song_dict["id"],
 			name=song_dict["name"],
 			album=song_dict["album"],

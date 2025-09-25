@@ -30,24 +30,53 @@
 		var play_buttons = document.getElementsByClassName("play-button");
 		for(var x = 0; x < play_buttons.length; x++)
 		{
-			play_buttons[x].innerHTML = "Play";
+			let play_button = play_buttons[x];;
+			play_button.innerHTML = "Play";
+			let button_id = play_button.id.match(/play_([a-zA-Z0-9]{22})-button/)[1];
+			play_button.onclick = () => get_start_and_play_song(play_button, button_id);
 		}
 
-		button.onclick = function() { update_button_and_pause(button, id); };
 		button.innerHTML = "Pause";
+		button.onclick = () => update_button_and_pause(button, id);
+
 
 		let start = document.getElementById(`song_start-${id}-input`).value;
-		let duration = document.getElementById(`song_duration-${id}-input`).value;
-		PLAYER.play_song(id, start, duration);
+		let action = function()
+		{
+			button.onclick = () => get_start_and_play_song(button, id);
+			button.innerHTML = "Play";
+		};
+		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${id}-input`).value, action);
+
+		PLAYER.play_song(id, start, timer);
 	}
 
 
 	function update_button_and_pause(button, id)
 	{
-		button.onclick = function() { get_start_and_play_song(button, id); };
+		button.onclick = () => get_start_and_play_song(button, id);
 		button.innerHTML = "Play";
 
 		PLAYER.pause();
+	}
+
+
+	function save(id)
+	{
+		let playlist_id = window.location.pathname.split("/")[2];
+
+		let start = document.getElementById(`song_start-${id}-input`).value;
+		let duration = document.getElementById(`song_duration-${id}-input`).value;
+
+		let xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("POST", `/api/song/save`, false);
+		xmlhttp.setRequestHeader("Content-Type", "application/json");
+		xmlhttp.send(JSON.stringify({playlist_id, song_id: id, start, duration}));
+
+		if(xmlhttp.status != 204)
+		{
+			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+		}
 	}
 
 </script>

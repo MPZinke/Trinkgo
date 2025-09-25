@@ -50,23 +50,25 @@
 
 		player_state_changed(web_playback_state)
 		{
-			if(web_playback_state.paused !== false)
+			let previous_is_playing = this.is_playing;
+			this.is_playing = !web_playback_state.paused;
+
+			// Skip if redundant.
+			if(previous_is_playing === this.is_playing)
 			{
-				return true;
+				return;
 			}
 
-			if(!this.is_playing && this.timer !== null)
+			if(this.is_playing && this.timer !== null)
 			{
 				this.timer.start();
 			}
-
-			this.is_playing = !web_playback_state.paused;
 		}
 
 
 		// —————————————————————————————————————————————————— API  —————————————————————————————————————————————————— //
 
-		play_song(id, start=null, duration=null)
+		play_song(id, start=null, timer=null)
 		{
 			if(this.timer !== null)
 			{
@@ -83,9 +85,9 @@
 				return alert(`${xmlhttp.status}`+xmlhttp.responseText);
 			}
 
-			if(duration !== null)
+			if(timer !== null)
 			{
-				this.timer = new Timer(this, duration);
+				this.timer = timer;
 			}
 		}
 
@@ -97,25 +99,19 @@
 				this.timer.cancel();
 			}
 
-			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.open("POST", `/api/pause`, false);
-			xmlhttp.setRequestHeader("Content-Type", "application/json");
-			xmlhttp.send(JSON.stringify({player_id: this.id}));
-
-			if(xmlhttp.status != 204)
-			{
-				return alert(`${xmlhttp.status}`+xmlhttp.responseText);
-			}
+			this.player.pause();
 		}
 	}
 
 
 	class Timer
 	{
-		constructor(player, duration)
+		constructor(player, duration, action=null)
 		{
 			this.player = player;
 			this.duration = duration;
+			this.action = action;
+
 			this.timeout = null;
 		}
 
@@ -134,14 +130,14 @@
 
 		cancel()
 		{
+			this.player.timer = null;
 			if(this.timeout === null)
 			{
-				return alert("No timer running");
+				return;
 			}
 
 			// FROM: https://www.w3schools.com/jsref/met_win_cleartimeout.asp
 			clearTimeout(this.timeout);
-			this.timer = null;
 		}
 
 
@@ -149,6 +145,11 @@
 		{
 			this.player.timer = null;
 			this.player.pause();
+
+			if(this.action !== null)
+			{
+				this.action();
+			}
 		}
 	}
 

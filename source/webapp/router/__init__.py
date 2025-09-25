@@ -62,6 +62,11 @@ def authorize(function: callable) -> callable:
 	return wrapper
 
 
+@app.get("/favicon.ico")
+def favicon():
+	return ("", 204)
+
+
 @app.route("/login")
 def login():
 	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
@@ -159,11 +164,31 @@ def api_play_song():
 	song_id: str = request_json.get("song_id")
 	start: Optional[int] = request_json.get("start")
 
-	song = database.song.select_song(song_id)
-	if(start is not None):
-		song.start = start
+	song = Song(
+		playlist_id=None,
+		id=song_id,
+		name=None,
+		album=None,
+		artists=None,
+		artwork=None,
+		start=start or 0,
+		duration=None,
+	)
 
 	spotify.requests.play_song(PLAYER, player_id, song)
+	return ("", 204)
+
+
+@app.post("/api/song/save")
+def api_song_save():
+	request_json = request.json
+	playlist_id: str = request_json.get("playlist_id")
+	song_id: str = request_json.get("song_id")
+	start: int = request_json.get("start")
+	duration: int = request_json.get("duration")
+
+	database.song.update_song_start_and_duration(playlist_id, song_id, start, duration)
+
 	return ("", 204)
 
 

@@ -20,6 +20,7 @@
 		</td>
 		<td>
 			<button
+				id="play_{{ song.id }}-button"
 				class="play-button"
 				onclick="get_start_and_play_song(this, `{{ song.id }}`)"
 			>
@@ -29,23 +30,23 @@
 			<input
 				id="song_start-{{ song.id }}-input"
 				type="number"
-				value=0
+				value={{ song.start }}
 			/>
 			ms
 			for
 			<input
 				id="song_duration-{{ song.id }}-input"
 				type="number"
-				value=0
+				value={{ song.duration }}
 			/>
 			ms
 		</td>
 		<td>
-			<a
-				href="/TODO"
+			<button
+				onclick="save(`{{ song.id }}`)"
 			>
 				Save
-			</a>
+			</button>
 		</td>
 	</tr>
 {% endmacro %}

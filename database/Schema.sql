@@ -12,7 +12,7 @@ CREATE TABLE "Playlists"
 DROP TABLE IF EXISTS "Songs" CASCADE;
 CREATE TABLE "Songs"
 (
-	"id" CHAR(22) NOT NULL PRIMARY KEY,
+	"id" CHAR(22) NOT NULL,
 	"name" TEXT NOT NULL,
 	"album" TEXT NOT NULL,
 	"artists" TEXT NOT NULL,
@@ -21,5 +21,6 @@ CREATE TABLE "Songs"
 	"duration" INT NOT NULL DEFAULT 0,
 	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
 	"Playlists.id" CHAR(22) NOT NULL,
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id")
+	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id"),
+	PRIMARY KEY ("Playlists.id", "id")
 );
