@@ -18,6 +18,10 @@ from random import randint
 
 
 from webapp.router import app
+from webapp.router.api import api_blueprint
+from webapp.router.auth import auth_blueprint
+from webapp.router.playlists import playlists_blueprint
+
 
 from spotify import requests
 from spotify.classes import Playlist, Song
@@ -36,13 +40,10 @@ def random_songs(songs: list[Song]) -> list[Song]:
 
 
 def main():
+	app.register_blueprint(api_blueprint)
+	app.register_blueprint(auth_blueprint)
+	app.register_blueprint(playlists_blueprint)
 	app.run(host="0.0.0.0", port=8080, debug=True)
-
-	# auth_token: str = requests.get_auth()
-	# playlist: Playlist|None = requests.get_playlist(auth_token, "49PAThhKRCCTXeydvq9uAp")
-
-	# card = Card(playlist.name, random_songs(playlist.songs))
-	# card.save()
 
 
 main()

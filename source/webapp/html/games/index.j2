@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Trinkgo</title>
+	</head>
+	<body>
+		<h1>Games</h1>
+		<form
+			method="POST"
+			action="/game/new"
+		>
+			<select
+				name="new_game_playlist-select"
+			>
+				<option
+					selected
+					hidden
+				>
+				</option>
+				{% for playlist in playlists  %}
+					<option
+						value="{{ playlist.id }}"
+					>
+						{{ playlist.name }}
+					</option>
+				{% endfor %}
+			<button>
+				New Game
+			</button>
+		<table>
+			{% for game in games %}
+
+			{% endfor %}
+		</table>
+	</body>
+</html>

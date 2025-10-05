@@ -68,7 +68,7 @@
 
 		// —————————————————————————————————————————————————— API  —————————————————————————————————————————————————— //
 
-		play_song(id, start=null, timer=null)
+		play_song(uri, start=null, timer=null)
 		{
 			if(this.timer !== null)
 			{
@@ -78,7 +78,7 @@
 			let xmlhttp = new XMLHttpRequest();
 			xmlhttp.open("POST", `/api/play/song`, false);
 			xmlhttp.setRequestHeader("Content-Type", "application/json");
-			xmlhttp.send(JSON.stringify({player_id: this.id, song_id: id, start: start}));
+			xmlhttp.send(JSON.stringify({player_id: this.id, uri: uri, start: start}));
 
 			if(xmlhttp.status != 204)
 			{

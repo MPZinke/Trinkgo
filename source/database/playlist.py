@@ -21,42 +21,44 @@ from database.connect import connect
 from spotify.classes import Playlist, Song
 
 
-
 @connect
 def insert_playlist(cursor: psycopg2.extras.RealDictCursor, playlist: Playlist):
-	query = """INSERT INTO "Playlists" ("id", "name") VALUES (%s, %s);"""
-	cursor.execute(query, (playlist.id, playlist.name))
+	query = """INSERT INTO "Playlists" ("uri", "name") VALUES (%s, %s) RETURNING "id";"""
+	cursor.execute(query, (playlist.uri, playlist.name))
+	playlist.id = cursor.fetchone()["id"]
 
 	query = """
-		INSERT INTO "Songs" ("id", "name", "album", "artists", "artwork", "start", "duration", "Playlists.id")
-		SELECT "Temp"."id", "Temp"."name", "Temp"."album", "Temp"."artists", "Temp"."artwork", "Temp"."start",
-			"Temp"."duration", %s
-		FROM UNNEST(%s, %s, %s, %s, %s, %s, %s) 
-		  	AS "Temp" ("id", "name", "album", "artists", "artwork", "start", "duration");
+		INSERT INTO "Songs" ("uri", "name", "album", "artists", "artwork", "length", "Playlists.id")
+		SELECT "Temp"."uri", "Temp"."name", "Temp"."album", "Temp"."artists", "Temp"."artwork", "Temp"."length", %s
+		FROM UNNEST(%s, %s, %s, %s, %s, %s) 
+		  AS "Temp" ("uri", "name", "album", "artists", "artwork", "length")
+		RETURNING "id";
 	"""
 
-	ids: list[str] = [song.id for song in playlist.songs]
+	uris: list[str] = [song.uri for song in playlist.songs]
 	names: list[str] = [song.name for song in playlist.songs]
 	albums: list[str] = [song.album for song in playlist.songs]
 	artists: list[str] = [song.artists for song in playlist.songs]
 	artworks: list[str] = [song.artwork for song in playlist.songs]
-	starts: list[int] = [song.start for song in playlist.songs]
-	durations: list[int] = [song.duration for song in playlist.songs]
+	lengths: list[str] = [song.length for song in playlist.songs]
 
-	cursor.execute(query, (playlist.id, ids, names, albums, artists, artworks, starts, durations))
+	cursor.execute(query, (playlist.id, uris, names, albums, artists, artworks, lengths))
+
+	for playlist_song, song in zip(playlist.songs, cursor):
+		playlist_song.id = song["id"]
 
 
 @connect
 def select_playlist(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist:
-	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (id,))
-	songs = [Song.from_dict(song_dict) for song_dict in cursor]
-
 	query = """SELECT * FROM "Playlists" WHERE "id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (id,))
-	playlist_dict = cursor.fetchone()
+	playlist: Playlist = Playlist.from_dict(cursor.fetchone())
 
-	return Playlist(playlist_dict["id"], playlist_dict["name"], songs)
+	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "is_deleted" = FALSE;"""
+	cursor.execute(query, (id,))
+	playlist.songs = [Song.from_dict({**song_dict, "playlist": playlist}) for song_dict in cursor]
+
+	return playlist
 
 
 @connect

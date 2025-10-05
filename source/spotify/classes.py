@@ -6,27 +6,37 @@ from typing import Optional
 
 
 class Song:
-	def __init__(self, playlist_id: str, id: str, name: str, album: str, artists: str, artwork: str, start: int, duration: int):
-		self.playlist_id: str = playlist_id
-		self.id: str = id
+	def __init__(
+		self,
+		id: int,
+		uri: str,
+		name: str,
+		album: str,
+		artists: str,
+		artwork: str,
+		length: int,
+		playlist: Optional[object],
+	):
+		self.id: int = id
+		self.uri: str = uri
 		self.name: str = name
 		self.album: str = album
 		self.artists: str = artists
 		self.artwork: str = artwork
-		self.start: int = start
-		self.duration: int = duration
+		self.length: int = length
+		self.playlist: Optional[object] = playlist
 
 
 	def __iter__(self):
 		yield from {
-			"playlist_id": self.playlist_id,
 			"id": self.id,
+			"uri": self.uri,
 			"name": self.name,
 			"album": self.album,
 			"artists": self.artists,
 			"artwork": self.artwork,
-			"start": self.start,
-			"duration": self.duration,
+			"length": self.length,
+			"playlist": self.playlist.id if(self.playlist is not None) else None,
 		}.items()
 
 
@@ -37,20 +47,21 @@ class Song:
 	@staticmethod
 	def from_dict(song_dict: dict):
 		return Song(
-			playlist_id=song_dict["Playlists.id"],
 			id=song_dict["id"],
+			uri=song_dict["uri"],
 			name=song_dict["name"],
 			album=song_dict["album"],
 			artists=song_dict["artists"],
 			artwork=song_dict["artwork"],
-			start=song_dict["start"],
-			duration=song_dict["duration"],
+			length=song_dict["length"],
+			playlist=song_dict.get("playlist"),
 		)
 
 
 class Playlist:
-	def __init__(self, id: str, name: str, songs: list[Song]):
-		self.id: str = id
+	def __init__(self, id: int, uri: str, name: str, songs: list[Song]):
+		self.id: int = id
+		self.uri: str = uri
 		self.name: str = name
 		self.songs: list[Song] = songs.copy()
 
@@ -58,6 +69,7 @@ class Playlist:
 	def __iter__(self):
 		yield from {
 			"id": self.id,
+			"uri": self.uri,
 			"name": self.name,
 			"songs": list(map(dict, self.songs)),
 		}.items()
@@ -71,41 +83,7 @@ class Playlist:
 	def from_dict(playlist_dict: dict):
 		return Playlist(
 			id=playlist_dict["id"],
+			uri=playlist_dict["uri"],
 			name=playlist_dict["name"],
 			songs=playlist_dict.get("songs", [])
 		)
-
-
-class Player:
-	def __init__(self):
-		self.access_token: Optional[str] = None
-		self.device_id: Optional[str] = None
-		self.refresh_token: Optional[str] = None
-		self._expiration: Optional[datetime] = None
-
-
-	def __iter__(self) -> iter:
-		yield from {
-			"access_token": self.access_token,
-			"device_id": self.device_id,
-			"refresh_token": self.refresh_token,
-		}.items()
-
-
-	def __str__(self) -> str:
-		return json.dumps(dict(self))
-
-
-	@property
-	def expired(self) -> bool:
-		if(self._expiration is None):
-			return True
-
-		return self._expiration - timedelta(minutes=1) <= datetime.now()
-
-
-	def expires_in(self, seconds: int) -> None:
-		self._expiration = datetime.now() + timedelta(seconds=seconds)
-
-
-	expires_in = property(None, expires_in)

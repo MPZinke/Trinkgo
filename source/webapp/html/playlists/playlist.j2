@@ -7,25 +7,71 @@
 	</title>
 	<body>
 
-
 		<a
 			href="https://open.spotify.com/track/{{ playlist.id }}"
 		>
 			Open In Spotify
 		</a>
 
+		<h2>
+			Sets
+		</h2>
+		<table>
+			<tr>
+				<td>
+					<a
+						href="/playlists/{{ playlist.id }}/sets/new"
+					>
+						+ New Set
+					</a>
+				</td>
+			</tr>
+			{% for playlist_set in playlist_sets %}
+				<tr>
+					<td>
+						<a
+							href="/playlists/{{ playlist.id }}/sets/{{ playlist_set.id }}"
+						>
+							{{ playlist_set.name }}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+
+		<h2>
+			Songs
+		</h2>
 		<table>
 			{% for song in playlist.songs %}
 				{{ render_song(loop.index, song) }}
 			{% endfor %}
 		</table>
+
+		<form
+			method="POST"
+			action="/playlists/{{ playlist.id }}"
+		>
+			<input
+				id="number_of_boards-input"
+				name="number_of_boards-input"
+				type="number"
+				value="1"
+				min="1"
+			/>
+			<button
+				onclick=""
+			>
+				Create Boards
+			</button>
+		</form>
 	</body>
 </html>
 
 {% include("player.j2") %}
 
 <script>
-	function get_start_and_play_song(button, id)
+	function get_start_and_play_song(button, uri)
 	{
 		var play_buttons = document.getElementsByClassName("play-button");
 		for(var x = 0; x < play_buttons.length; x++)
@@ -37,18 +83,15 @@
 		}
 
 		button.innerHTML = "Pause";
-		button.onclick = () => update_button_and_pause(button, id);
+		button.onclick = () => update_button_and_pause(button, uri);
 
-
-		let start = document.getElementById(`song_start-${id}-input`).value;
 		let action = function()
 		{
-			button.onclick = () => get_start_and_play_song(button, id);
+			button.onclick = () => get_start_and_play_song(button, uri);
 			button.innerHTML = "Play";
 		};
-		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${id}-input`).value, action);
 
-		PLAYER.play_song(id, start, timer);
+		PLAYER.play_song(uri);
 	}
 
 
@@ -59,24 +102,4 @@
 
 		PLAYER.pause();
 	}
-
-
-	function save(id)
-	{
-		let playlist_id = window.location.pathname.split("/")[2];
-
-		let start = document.getElementById(`song_start-${id}-input`).value;
-		let duration = document.getElementById(`song_duration-${id}-input`).value;
-
-		let xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("POST", `/api/song/save`, false);
-		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify({playlist_id, song_id: id, start, duration}));
-
-		if(xmlhttp.status != 204)
-		{
-			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
-		}
-	}
-
 </script>

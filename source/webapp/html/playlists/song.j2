@@ -20,32 +20,11 @@
 		</td>
 		<td>
 			<button
-				id="play_{{ song.id }}-button"
+				id="play_{{ song.uri }}-button"
 				class="play-button"
-				onclick="get_start_and_play_song(this, `{{ song.id }}`)"
+				onclick="get_start_and_play_song(this, `{{ song.uri }}`)"
 			>
 				Play
-			</button>
-			@
-			<input
-				id="song_start-{{ song.id }}-input"
-				type="number"
-				value={{ song.start }}
-			/>
-			ms
-			for
-			<input
-				id="song_duration-{{ song.id }}-input"
-				type="number"
-				value={{ song.duration }}
-			/>
-			ms
-		</td>
-		<td>
-			<button
-				onclick="save(`{{ song.id }}`)"
-			>
-				Save
 			</button>
 		</td>
 	</tr>

@@ -1,0 +1,57 @@
+
+{% macro render_set_song(index, set_song) %}
+	<tr>
+		<td>
+			{{ index }}
+		</td>
+		<td>
+			<img
+				src="{{ set_song.song.artwork }}"
+			>
+		</td>
+		<td>
+			<b>
+				{{ set_song.song.name }}
+			</b>
+			<br/>
+			{{ set_song.song.artists }}
+			<br/>
+			{{ set_song.song.album }}
+		</td>
+		<td>
+			<button
+				id="play_{{ set_song.id }}-button"
+				class="play-button"
+				onclick="get_start_and_play_song(this, `{{ set_song.id }}`)"
+			>
+				Play
+			</button>
+			@
+			<input
+				id="song_start-{{ set_song.id }}-input"
+				name="song_start-{{ set_song.id }}-input"
+				type="number"
+				value={{ set_song.start }}
+				max="{{ set_song.duration-1 }}"
+			/>
+			ms
+			for
+			<input
+				id="song_duration-{{ set_song.id }}-input"
+				name="song_duration-{{ set_song.id }}-input"
+				type="number"
+				value="{{ set_song.duration }}"
+				min="1"
+				max="{{ set_song.duration }}"
+			/>
+			ms
+		</td>
+		<td>
+			<button
+				onclick="save(`{{ set_song.id }}`)"
+			>
+				Save
+			</button>
+		</td>
+	</tr>
+{% endmacro %}

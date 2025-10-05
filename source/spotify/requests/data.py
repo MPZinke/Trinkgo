@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.06.04                                                                                                      #
+#   on 2025.09.25                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,47 +14,44 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-import base64
-from pathlib import Path
-import random
-import string
-from typing import Optional
-import urllib.parse
-
-
-from flask import redirect, render_template, request, Flask
 import requests
 
 
-import database
-import spotify
-from spotify.auth import TOKENS
+from spotify.auth import Tokens
 from spotify.classes import Playlist, Song
-from webapp.router.auth import authorize
 
 
+def get_playlist(tokens: Tokens, uri: str) -> Playlist:
+	url = (
+		f"https://api.spotify.com/v1/playlists/{uri}"
+		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,artists(name))"
+	)
+	headers = {"Authorization": f"Bearer {tokens.access_token}"}
+	response: requests.Response = requests.get(url, headers=headers)
+	response.raise_for_status()
 
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
+	playlist_info = response.json()
 
+	playlist = Playlist(id=0, uri=uri, name=playlist_info["name"], songs=[])
+	for song_info in playlist_info["tracks"]["items"]:
+		track = song_info["track"]
 
-app = Flask("Catan", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+		artists = ", ".join(artist["name"] for artist in track["artists"])
 
+		images: list[dict] = track["album"]["images"]
+		images.sort(key=lambda image: image["width"])
+		artwork = next((image["url"] for image in images), None)
 
-@app.get("/favicon.ico")
-def favicon():
-	return ("", 204)
+		song = Song(
+			id=0,
+			uri=track["id"],
+			name=track["name"],
+			album=track["album"]["name"],
+			artists=artists,
+			artwork=artwork,
+			length=track["duration_ms"],
+			playlist=playlist,
+		)
+		playlist.songs.append(song)
 
-
-@app.get("/")
-@app.get("/home")
-@authorize
-def GET_home():
-	return render_template("index.j2", access_token=TOKENS.access_token)
-
-
-@app.get("/player")
-@authorize
-def GET_play():
-	return render_template("play.j2", access_token=TOKENS.access_token)
+	return playlist

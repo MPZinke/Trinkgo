@@ -1,0 +1,62 @@
+#!/opt/homebrew/bin/python3
+# -*- coding: utf-8 -*-
+__author__ = "MPZinke"
+
+########################################################################################################################
+#                                                                                                                      #
+#   created by: MPZinke                                                                                                #
+#   on 2025.09.25                                                                                                      #
+#                                                                                                                      #
+#   DESCRIPTION:                                                                                                       #
+#   BUGS:                                                                                                              #
+#   FUTURE:                                                                                                            #
+#                                                                                                                      #
+########################################################################################################################
+
+
+import requests
+
+
+from spotify.auth import Tokens
+
+
+def get_access_token(tokens: Tokens, code: str):
+	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
+	#    @: Request Access Token
+	url = "https://accounts.spotify.com/api/token"
+	headers = {
+		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+		"Content-Type": "application/x-www-form-urlencoded",
+	}
+	params = {
+		"code": code,
+		"grant_type": "authorization_code",
+		"redirect_uri": "http://127.0.0.1:8080/authenticated",
+	}
+	response = requests.post(url, headers=headers, params=params)
+
+	print(response.json())  # TEMP
+
+	response_json = response.json()
+	tokens.access_token = response_json.get("access_token")
+	tokens.refresh_token = response_json.get("refresh_token")
+	tokens.expires_in = response_json.get("expires_in")
+
+
+def refresh_access_token(tokens: Tokens):
+	# FROM: https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
+	url = "https://accounts.spotify.com/api/token"
+	headers = {
+		"Content-Type": "application/x-www-form-urlencoded",
+		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+	}
+	params = {
+		"grant_type": "refresh_token",
+		"refresh_token": tokens.refresh_token,
+	}
+	response: requests.Response = requests.post(url, headers=headers, params=params)
+	response.raise_for_status()
+
+	response_json = response.json()
+	tokens.access_token = response_json.get("access_token")
+	tokens.expires_in = response_json.get("expires_in")
