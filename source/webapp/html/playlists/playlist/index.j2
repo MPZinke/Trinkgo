@@ -1,20 +1,43 @@
-{% from "playlists/song.j2" import render_song %}
+{% from "playlists/playlist/song.j2" import render_song %}
 
 <!DOCTYPE html>
 <html>
 	<title>
 		{{ playlist.name }} Playlist
 	</title>
+
 	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/playlists"
+			>
+				Playlists
+			</a>
+			&gt; {{ playlist.name }}
+		</header>
+
+		<h1>
+			{{ playlist.name }}
+		</h1>
 
 		<a
-			href="https://open.spotify.com/track/{{ playlist.id }}"
+			href="https://open.spotify.com/playlists/{{ playlist.uri }}"
 		>
 			Open In Spotify
 		</a>
 
 		<h2>
-			Sets
+			<a
+				href="/playlists/{{ playlist.id }}/sets"
+			>
+				Sets
+			</a>
 		</h2>
 		<table>
 			<tr>
@@ -40,7 +63,11 @@
 		</table>
 
 		<h2>
-			Songs
+			<a
+				href="/playlists/{{ playlist.id }}/songs"
+			>
+				Songs
+			</a>
 		</h2>
 		<table>
 			{% for song in playlist.songs %}

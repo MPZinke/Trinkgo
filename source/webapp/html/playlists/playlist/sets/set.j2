@@ -1,4 +1,4 @@
-{% from "playlists/sets/set_song.j2" import render_set_song %}
+{% from "playlists/playlist/sets/song.j2" import render_set_song %}
 
 <!DOCTYPE html>
 <html>
@@ -6,34 +6,40 @@
 		{{ playlist_set.name }} Set
 	</title>
 
-	<head>
-		<a
-			href="/playlists"
-		>
-			Playlists
-		</a>
-		>
-		<a
-			href="/playlists/{{ playlist_set.playlist.id }}"
-		>
-			{{ playlist_set.playlist.name }}
-		</a>
-		>
-		<a
-			href="/playlists/{{ playlist_set.playlist.id }}/sets"
-		>
-			Sets
-		</a>
-		> {{ playlist_set.name }}
-	</head>
-
 	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/playlists"
+			>
+				Playlists
+			</a>
+			&gt;
+			<a
+				href="/playlists/{{ playlist_set.playlist.id }}"
+			>
+				{{ playlist_set.playlist.name }}
+			</a>
+			&gt;
+			<a
+				href="/playlists/{{ playlist_set.playlist.id }}/sets"
+			>
+				Sets
+			</a>
+			&gt; {{ playlist_set.name }}
+		</header>
+
 		<h1>
 			'{{ playlist_set.playlist.name }}' {{ playlist_set.name }} Set
 		</h1>
 
 		<a
-			href="https://open.spotify.com/track/{{ playlist_set.playlist.id }}"
+			href="https://open.spotify.com/playlists/{{ playlist_set.playlist.uri }}"
 		>
 			Open In Spotify
 		</a>
@@ -67,7 +73,7 @@
 {% include("player.j2") %}
 
 <script>
-	function get_start_and_play_song(button, id)
+	function get_start_and_play_song(button, uri)
 	{
 		var play_buttons = document.getElementsByClassName("play-button");
 		for(var x = 0; x < play_buttons.length; x++)
@@ -79,36 +85,36 @@
 		}
 
 		button.innerHTML = "Pause";
-		button.onclick = () => update_button_and_pause(button, id);
+		button.onclick = () => update_button_and_pause(button, uri);
 
 
-		let start = document.getElementById(`song_start-${id}-input`).value;
+		let start = document.getElementById(`song_start-${uri}-input`).value;
 		let action = function()
 		{
-			button.onclick = () => get_start_and_play_song(button, id);
+			button.onclick = () => get_start_and_play_song(button, uri);
 			button.innerHTML = "Play";
 		};
-		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${id}-input`).value, action);
+		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${uri}-input`).value, action);
 
-		PLAYER.play_song(id, start, timer);
+		PLAYER.play_song(uri, start, timer);
 	}
 
 
-	function update_button_and_pause(button, id)
+	function update_button_and_pause(button, uri)
 	{
-		button.onclick = () => get_start_and_play_song(button, id);
+		button.onclick = () => get_start_and_play_song(button, uri);
 		button.innerHTML = "Play";
 
 		PLAYER.pause();
 	}
 
 
-	function save(id)
+	function save(id, uri)
 	{
 		let playlist_id = window.location.pathname.split("/")[2];
 
-		let start = document.getElementById(`song_start-${id}-input`).value;
-		let duration = document.getElementById(`song_duration-${id}-input`).value;
+		let start = document.getElementById(`song_start-${uri}-input`).value;
+		let duration = document.getElementById(`song_duration-${uri}-input`).value;
 
 		let xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("POST", `/api/song/save`, false);

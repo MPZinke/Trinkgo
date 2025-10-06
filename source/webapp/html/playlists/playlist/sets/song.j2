@@ -20,16 +20,16 @@
 		</td>
 		<td>
 			<button
-				id="play_{{ set_song.id }}-button"
+				id="play_{{ set_song.song.uri }}-button"
 				class="play-button"
-				onclick="get_start_and_play_song(this, `{{ set_song.id }}`)"
+				onclick="get_start_and_play_song(this, `{{ set_song.song.uri }}`)"
 			>
 				Play
 			</button>
 			@
 			<input
-				id="song_start-{{ set_song.id }}-input"
-				name="song_start-{{ set_song.id }}-input"
+				id="song_start-{{ set_song.song.uri }}-input"
+				name="song_start-{{ set_song.song.uri }}-input"
 				type="number"
 				value={{ set_song.start }}
 				max="{{ set_song.duration-1 }}"
@@ -37,8 +37,8 @@
 			ms
 			for
 			<input
-				id="song_duration-{{ set_song.id }}-input"
-				name="song_duration-{{ set_song.id }}-input"
+				id="song_duration-{{ set_song.song.uri }}-input"
+				name="song_duration-{{ set_song.song.uri }}-input"
 				type="number"
 				value="{{ set_song.duration }}"
 				min="1"
@@ -48,7 +48,7 @@
 		</td>
 		<td>
 			<button
-				onclick="save(`{{ set_song.id }}`)"
+				onclick="save(`{{ set_song.id }}`, `{{ set_song.song.uri }}`)"
 			>
 				Save
 			</button>

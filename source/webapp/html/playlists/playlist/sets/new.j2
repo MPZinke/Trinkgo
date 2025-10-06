@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		New Set {{ playlist.name }}
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/playlists"
+			>
+				Playlists
+			</a>
+			&gt;
+			<a
+				href="/playlists/{{ playlist.id }}"
+			>
+				{{ playlist.name }}
+			</a>
+			<a
+				href="/playlists/{{ playlist.id }}/sets"
+			>
+				Sets
+			</a>
+			&gt; New
+		</header>
+
+		<h1>
+			New Set For {{ playlist.name }}
+		</h1>
+
+		<form
+			method="POST"
+		>
+			Set Name
+			<input
+				id="set_name-input"
+				name="set_name-input"
+			/>
+			<button>
+				Create
+			</button>
+		</form>
+	</body>
+</html>

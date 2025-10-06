@@ -19,19 +19,17 @@ def select_song(cursor: psycopg2.extras.RealDictCursor, playlist_id: str, id: st
 @connect
 def update_song_start_and_duration(
 	cursor: psycopg2.extras.RealDictCursor,
-	playlist_id: str,
 	id: str,
 	start: int,
 	duration: int
 ) -> Song:
 	query = """
-		UPDATE "Songs"
+		UPDATE "SongsSets"
 		SET "start" = %s, "duration" = %s
-		WHERE "Playlists.id" = %s
-		  AND "id" = %s
+		WHERE "id" = %s
 		  AND "is_deleted" = FALSE
 		RETURNING *;
 	"""
-	cursor.execute(query, (start, duration, playlist_id, id))
+	cursor.execute(query, (start, duration, id))
 
 	return dict(cursor.fetchone())

@@ -27,9 +27,9 @@ import requests
 
 
 import database
+from webapp.router import app
 import spotify
 from spotify.classes import Playlist, Song
-from spotify.auth import TOKENS
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -42,15 +42,8 @@ auth_blueprint = Blueprint('auth_blueprint', __name__, template_folder=HTML_DIRE
 
 def authorize(function: callable) -> callable:
 	def wrapper(*args: list, **kwargs: dict):
-		if(TOKENS.expired):
-			if(TOKENS.refresh_token is None):
-				return redirect("/login")
-
-			try:
-				spotify.requests.auth.refresh_access_token(TOKENS)
-
-			except requests.exceptions.HTTPError:
-				return redirect("/login")
+		if(not app.tokens.authenticated):
+			return redirect("/login")
 
 		return function(*args, **kwargs)
 
@@ -82,7 +75,6 @@ def authenticated():
 	if(code is None):
 		raise Exception("URL parameter `code` is missing.")
 
-	spotify.requests.auth.get_access_token(TOKENS, code)
-
+	app.tokens.code = code
 
 	return redirect("/home")

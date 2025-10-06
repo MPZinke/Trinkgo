@@ -11,9 +11,8 @@ import requests
 
 
 import database
+from webapp.router import app, authorize
 import spotify
-from spotify.auth import TOKENS
-from webapp.router.auth import authorize
 from spotify.classes import Playlist, Song
 
 

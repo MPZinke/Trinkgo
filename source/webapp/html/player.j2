@@ -1,6 +1,4 @@
 
-
-
 <script
 	src="https://sdk.scdn.co/spotify-player.js"
 >
@@ -38,6 +36,7 @@
 		{
 			this.id = web_playback_state.device_id;
 			this.is_ready = true;
+			console.log(`Player ${this.id} is ready.`);
 		}
 
 

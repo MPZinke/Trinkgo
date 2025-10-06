@@ -1,0 +1,100 @@
+{% from "playlists/playlist/song.j2" import render_song %}
+
+<!DOCTYPE html>
+<html>
+	<title>
+		{{ playlist.name }} Playlist
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/playlists"
+			>
+				Playlists
+			</a>
+			&gt;
+			<a
+				href="/playlists/{{ playlist.id }}"
+			>
+				{{ playlist.name }}
+			</a>
+			&gt; Songs
+		</header>
+
+		<h1>
+			{{ playlist.name }}
+		</h1>
+
+		<a
+			href="https://open.spotify.com/playlists/{{ playlist.uri }}"
+		>
+			Open In Spotify
+		</a>
+
+		<table>
+			{% for playlist_set in playlist_sets %}
+				<tr>
+					<td>
+						<a
+							href="/playlists/{{ playlist.id }}/sets/{{ playlist_set.id }}"
+						>
+							{{ playlist_set.name }}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+
+		<h2>
+			Songs
+		</h2>
+		<table>
+			{% for song in playlist.songs %}
+				{{ render_song(loop.index, song) }}
+			{% endfor %}
+		</table>
+	</body>
+</html>
+
+{% include("player.j2") %}
+
+<script>
+	function get_start_and_play_song(button, uri)
+	{
+		var play_buttons = document.getElementsByClassName("play-button");
+		for(var x = 0; x < play_buttons.length; x++)
+		{
+			let play_button = play_buttons[x];;
+			play_button.innerHTML = "Play";
+			let button_id = play_button.id.match(/play_([a-zA-Z0-9]{22})-button/)[1];
+			play_button.onclick = () => get_start_and_play_song(play_button, button_id);
+		}
+
+		button.innerHTML = "Pause";
+		button.onclick = () => update_button_and_pause(button, uri);
+
+		let action = function()
+		{
+			button.onclick = () => get_start_and_play_song(button, uri);
+			button.innerHTML = "Play";
+		};
+
+		PLAYER.play_song(uri);
+	}
+
+
+	function update_button_and_pause(button, id)
+	{
+		button.onclick = () => get_start_and_play_song(button, id);
+		button.innerHTML = "Play";
+
+		PLAYER.pause();
+	}
+</script>

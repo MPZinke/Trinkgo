@@ -20,7 +20,7 @@ import requests
 from spotify.auth import Tokens
 
 
-def get_access_token(tokens: Tokens, code: str):
+def get_access_token(code: str):
 	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
 	#    @: Request Access Token
 	url = "https://accounts.spotify.com/api/token"
@@ -37,13 +37,10 @@ def get_access_token(tokens: Tokens, code: str):
 
 	print(response.json())  # TEMP
 
-	response_json = response.json()
-	tokens.access_token = response_json.get("access_token")
-	tokens.refresh_token = response_json.get("refresh_token")
-	tokens.expires_in = response_json.get("expires_in")
+	return response.json()
 
 
-def refresh_access_token(tokens: Tokens):
+def refresh_access_token(refresh_token: str):
 	# FROM: https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
 	url = "https://accounts.spotify.com/api/token"
 	headers = {
@@ -52,11 +49,9 @@ def refresh_access_token(tokens: Tokens):
 	}
 	params = {
 		"grant_type": "refresh_token",
-		"refresh_token": tokens.refresh_token,
+		"refresh_token": refresh_token,
 	}
 	response: requests.Response = requests.post(url, headers=headers, params=params)
 	response.raise_for_status()
 
-	response_json = response.json()
-	tokens.access_token = response_json.get("access_token")
-	tokens.expires_in = response_json.get("expires_in")
+	return response.json()

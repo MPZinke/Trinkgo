@@ -28,10 +28,13 @@ import requests
 
 import database
 import spotify
-from spotify.auth import TOKENS
+from spotify.auth import Tokens
 from spotify.classes import Playlist, Song
-from webapp.router.auth import authorize
 
+# from webapp.router.app import app, authorize
+# from webapp.router.api import api_blueprint
+# from webapp.router.auth import auth_blueprint
+# from webapp.router.playlists import playlists_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -40,21 +43,16 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
 app = Flask("Catan", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+app.tokens = Tokens()
+app.context_processor(app.tokens.context_processor)
+
+
+# from webapp.router.app import app, authorize
+# from webapp.router.api import api_blueprint
+# from webapp.router.auth import auth_blueprint
+# from webapp.router.playlists import playlists_blueprint
 
 
 @app.get("/favicon.ico")
 def favicon():
 	return ("", 204)
-
-
-@app.get("/")
-@app.get("/home")
-@authorize
-def GET_home():
-	return render_template("index.j2", access_token=TOKENS.access_token)
-
-
-@app.get("/player")
-@authorize
-def GET_play():
-	return render_template("play.j2", access_token=TOKENS.access_token)

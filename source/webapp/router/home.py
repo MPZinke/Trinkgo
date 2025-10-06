@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.06.01                                                                                                      #
+#   on 2025.10.05                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,37 +14,41 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from random import randint
+import base64
+from pathlib import Path
+import random
+import string
+from typing import Optional
+import urllib.parse
 
 
+from flask import redirect, render_template, request, Flask, Blueprint
+import requests
 
-from card import Card
-from spotify import requests
+
+import database
+import spotify
+from spotify.auth import Tokens
 from spotify.classes import Playlist, Song
-from webapp.router import app
-from webapp.router.api import api_blueprint
-from webapp.router.auth import auth_blueprint
-from webapp.router.home import home_blueprint
-from webapp.router.playlists import playlists_blueprint
+from webapp.router.auth import authorize
 
 
-def random_songs(songs: list[Song]) -> list[Song]:
-	card_songs = []
-	while(len(card_songs) < 25):
-		random_index = randint(0, len(songs)-1)
-		song = songs[random_index]
-		if(song not in card_songs):
-			card_songs.append(song)
-
-	return card_songs
+WEBAPP_DIRECTORY = Path(__file__).parents[1]
+HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
+STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
-def main():
-	app.register_blueprint(api_blueprint)
-	app.register_blueprint(auth_blueprint)
-	app.register_blueprint(home_blueprint)
-	app.register_blueprint(playlists_blueprint)
-	app.run(host="0.0.0.0", port=8080, debug=True)
+home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
 
 
-main()
+@home_blueprint.get("/")
+@home_blueprint.get("/home")
+@authorize
+def GET_home():
+	return render_template("index.j2")
+
+
+@home_blueprint.get("/player")
+@authorize
+def GET_play():
+	return render_template("play.j2")

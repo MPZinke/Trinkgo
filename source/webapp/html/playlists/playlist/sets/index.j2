@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		{{ playlist.name }} Sets
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/playlists"
+			>
+				Playlists
+			</a>
+			&gt;
+			<a
+				href="/playlists/{{ playlist.id }}"
+			>
+				{{ playlist.name }}
+			</a>
+			&gt; Sets
+		</header>
+
+		<h1>
+			Playlists Sets For {{ playlist.name }}
+		</h1>
+		<a
+			href="/playlists/{{ playlist.id }}/new"
+		>
+			+ New
+		</a>
+
+		<table>
+			{% for playlist_set in playlist_sets %}
+				<tr>
+					<td>
+						<a
+							href="/playlists/{{ playlist.id }}/sets/{{ playlist_set.id }}"
+						>
+							{{ playlist_set.name }}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
