@@ -17,9 +17,6 @@ __author__ = "MPZinke"
 import requests
 
 
-from spotify.auth import Tokens
-
-
 def get_access_token(code: str):
 	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
 	#    @: Request Access Token

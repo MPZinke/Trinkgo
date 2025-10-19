@@ -11,9 +11,9 @@ from spotify.classes import Song
 def select_song(cursor: psycopg2.extras.RealDictCursor, playlist_id: str, id: str) -> Song:
 	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (playlist_id, id))
-	playlist_dict = cursor.fetchone()
+	song_dict = cursor.fetchone()
 
-	return Song.from_dict(playlist_dict)
+	return Song.from_dict(song_dict)
 
 
 @connect

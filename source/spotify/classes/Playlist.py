@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.10.05                                                                                                      #
+#   on 2025.10.06                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,34 +14,40 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from pathlib import Path
+from datetime import datetime, timedelta
+import json
+from typing import Optional
 
 
-from flask import render_template, Blueprint
-import requests
+from spotify.classes import Song
 
 
-import database
-import spotify
-from webapp.router.auth import authorize
+class Playlist:
+	def __init__(self, id: int, uri: str, name: str, songs: list[Song]):
+		self.id: int = id
+		self.uri: str = uri
+		self.name: str = name
+		self.songs: list[Song] = songs.copy()
 
 
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
+	def __iter__(self):
+		yield from {
+			"id": self.id,
+			"uri": self.uri,
+			"name": self.name,
+			"songs": list(map(dict, self.songs)),
+		}.items()
 
 
-home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+	def __str__(self) -> str:
+		return json.dumps(dict(self), indent=4)
 
 
-@home_blueprint.get("/")
-@home_blueprint.get("/home")
-@authorize
-def GET_home():
-	return render_template("index.j2")
-
-
-@home_blueprint.get("/player")
-@authorize
-def GET_play():
-	return render_template("play.j2")
+	@staticmethod
+	def from_dict(playlist_dict: dict):
+		return Playlist(
+			id=playlist_dict["id"],
+			uri=playlist_dict["uri"],
+			name=playlist_dict["name"],
+			songs=playlist_dict.get("songs", [])
+		)

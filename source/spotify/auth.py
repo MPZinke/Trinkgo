@@ -51,7 +51,8 @@ class Tokens:
 	@property
 	def access_token(self) -> Optional[str]:
 		if(self._code is None):
-			raise LoginException()
+			return None
+			# raise LoginException()
 
 		if(self.expiration is None or self.expiration - timedelta(minutes=1) <= datetime.now()):
 			auth_data: dict = spotify.requests.auth.refresh_access_token(self._refresh_token)

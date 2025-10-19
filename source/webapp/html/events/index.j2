@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		Events
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt; Events
+		</header>
+
+		<h1>
+			Events
+		</h1>
+		<a
+			href="/events/new"
+		>
+			+ New
+		</a>
+		<table>
+			{% for event in events %}
+				<tr>
+					<td>
+						<a
+							href="/events/{{ event.id }}"
+						>
+							{{ event.name }}
+						</a>
+					</td>
+					<td>
+						{{ event.date }}
+					</td>
+					<td>
+						<a
+							href="/events/{{ event.id }}/rounds/new"
+						>
+							+ New Round
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

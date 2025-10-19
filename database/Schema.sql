@@ -51,14 +51,45 @@ CREATE TABLE "SongsSets"
 );
 
 
+DROP TABLE IF EXISTS "Events" CASCADE;
+CREATE TABLE "Events"
+(
+	"id" SERIAL NOT NULL PRIMARY KEY,
+	"name" TEXT NOT NULL,
+	"date" DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"start" TIMESTAMP DEFAULT NULL,
+	"ended" BOOLEAN DEFAULT FALSE,
+	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
+	UNIQUE ("name", "date")
+);
+
+
+DROP TABLE IF EXISTS "Rounds" CASCADE;
+CREATE TABLE "Rounds"
+(
+	"id" SERIAL NOT NULL PRIMARY KEY,
+	"name" TEXT NOT NULL,
+	"size" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
+	"start" TIMESTAMP DEFAULT NULL,
+	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
+	"Events.id" INT NOT NULL,
+	"PlaylistsSets.id" INT NOT NULL,
+	FOREIGN KEY ("Events.id") REFERENCES "Events" ("id"),
+	FOREIGN KEY ("PlaylistsSets.id") REFERENCES "PlaylistsSets" ("id")
+);
+
+
 DROP TABLE IF EXISTS "Cards" CASCADE;
 CREATE TABLE "Cards"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
-	"Playlists.id" INT NOT NULL,
+	"identifier" INT NOT NULL,
+	"PlaylistsSets.id" INT NOT NULL,
+	"Rounds.id" INT NOT NULL,
 	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
-	"size" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id")
+	FOREIGN KEY ("PlaylistsSets.id") REFERENCES "PlaylistsSets" ("id"),
+	FOREIGN KEY ("Rounds.id") REFERENCES "Rounds" ("id"),
+	UNIQUE ("identifier", "Rounds.id")
 );
 
 
@@ -67,38 +98,11 @@ CREATE TABLE "CardsSongs"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
 	"order" INT NOT NULL,
-	"Songs.id" INT NOT NULL,
+	"SongsSets.id" INT NOT NULL,
 	"Playlists.id" INT NOT NULL,
 	"Cards.id" INT NOT NULL,
 	UNIQUE ("order", "Cards.id"),
-	FOREIGN KEY ("Songs.id") REFERENCES "Songs" ("id"),
+	FOREIGN KEY ("SongsSets.id") REFERENCES "SongsSets" ("id"),
 	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id"),
-	FOREIGN KEY ("Cards.id") REFERENCES "Cards" ("id")
-);
-
-
-DROP TABLE IF EXISTS "Games" CASCADE;
-CREATE TABLE "Games"
-(
-	"id" SERIAL NOT NULL PRIMARY KEY,
-	"started_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	"end_date" TIMESTAMP DEFAULT NULL,
-	"Playlists.id" INT NOT NULL,
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id")
-);
-
-
-DROP TABLE IF EXISTS "Rounds" CASCADE;
-CREATE TABLE "Rounds"
-(
-	"id" SERIAL NOT NULL PRIMARY KEY,
-	"order" INT NOT NULL,
-	"Games.id" INT NOT NULL,
-	"Playlists.id" INT NOT NULL,
-	"Songs.id" INT NOT NULL,
-	"Cards.id" INT DEFAULT NULL,  -- board that won this round
-	FOREIGN KEY ("Games.id") REFERENCES "Games" ("id"),
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id"),
-	FOREIGN KEY ("Songs.id") REFERENCES "Songs" ("id"),
 	FOREIGN KEY ("Cards.id") REFERENCES "Cards" ("id")
 );

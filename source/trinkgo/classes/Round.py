@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.10.05                                                                                                      #
+#   on 2025.10.11                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,34 +14,43 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from pathlib import Path
+from datetime import datetime
+from typing import Optional, TypeVar
 
 
-from flask import render_template, Blueprint
-import requests
+Card = TypeVar("Card")
+Event = TypeVar("Event")
+PlaylistSet = TypeVar("PlaylistSet")
 
 
-import database
-import spotify
-from webapp.router.auth import authorize
+class Round:
+	def __init__(
+		self,
+		id: int,
+		name: str,
+		size: list[int],
+		start: Optional[datetime],
+		event: Event,
+		playlist_set: PlaylistSet,
+		cards: Optional[list[Card]],
+	):
+		self.id: int = id
+		self.name: str = name
+		self.size: list[int] = size
+		self.start: datetime = start
+		self.event: Event = event
+		self.playlist_set: PlaylistSet = playlist_set
+		self.cards: Optional[list[Card]] = cards
 
 
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-
-
-@home_blueprint.get("/")
-@home_blueprint.get("/home")
-@authorize
-def GET_home():
-	return render_template("index.j2")
-
-
-@home_blueprint.get("/player")
-@authorize
-def GET_play():
-	return render_template("play.j2")
+	@staticmethod
+	def from_dict(round_dict: dict):
+		return Round(
+			id=round_dict["id"],
+			name=round_dict["name"],
+			size=round_dict["date"],
+			start=round_dict["start"],
+			event=round_dict.get("event"),
+			playlist_set=round_dict["playlist_set"],
+			cards=round_dict.get("cards"),
+		)

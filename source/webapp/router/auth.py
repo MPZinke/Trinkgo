@@ -14,22 +14,17 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-import base64
 from pathlib import Path
-import random
-import string
-from typing import Optional
 import urllib.parse
 
 
-from flask import redirect, render_template, request, Blueprint
+from flask import redirect, request, Blueprint
 import requests
 
 
 import database
 from webapp.router import app
 import spotify
-from spotify.classes import Playlist, Song
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]

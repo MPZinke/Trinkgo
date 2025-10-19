@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.10.05                                                                                                      #
+#   on 2025.10.06                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,34 +14,5 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from pathlib import Path
-
-
-from flask import render_template, Blueprint
-import requests
-
-
-import database
-import spotify
-from webapp.router.auth import authorize
-
-
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-
-
-@home_blueprint.get("/")
-@home_blueprint.get("/home")
-@authorize
-def GET_home():
-	return render_template("index.j2")
-
-
-@home_blueprint.get("/player")
-@authorize
-def GET_play():
-	return render_template("play.j2")
+from spotify.classes.Playlist import Playlist
+from spotify.classes.Song import Song

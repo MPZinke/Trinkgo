@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		Trinkgo
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/events"
+			>
+				Events
+			</a>
+			&gt;
+			<a
+				href="/events/{{ event.id }}"
+			>
+				{{ event.name }}
+			</a>
+			&gt;
+			<a
+				href="/events/{{ event.id }}/rounds"
+			>
+				Rounds
+			</a>
+			&gt; New
+		</header>
+		<h1>
+			New Round
+		</h1>
+
+		<form
+			method="POST"
+		>
+			Name
+			<input
+				name="round_name-input"
+			/>
+
+			<br/>
+
+			Playlist Set
+			<select
+				name="playlist_set-select"
+			>
+				<option
+					hidden
+					selected
+				></option>
+				{% for playlist_set in playlist_sets %}
+					<option
+						value="{{ playlist_set.id }}"
+					>
+						{{ playlist_set.name }}
+					</option>
+				{% endfor %}
+			</select>
+
+			<br/>
+
+			Board Size
+			Width
+			<input
+				name="round_size_columns-input"
+				type="number"
+				min="1"
+				value="5"
+			/>
+			Height
+			<input
+				name="round_size_rows-input"
+				type="number"
+				min="1"
+				value="5"
+			/>
+
+			<br/>
+
+			<button>
+				Create
+			</button>
+		</form>
+	</body>
+</html>
