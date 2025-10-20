@@ -30,16 +30,18 @@ class Round:
 		name: str,
 		size: list[int],
 		start: Optional[datetime],
-		event: Event,
-		playlist_set: PlaylistSet,
+		ended: bool,
+		event: Optional[Event],
+		playlist_set: Optional[PlaylistSet],
 		cards: Optional[list[Card]],
 	):
 		self.id: int = id
 		self.name: str = name
 		self.size: list[int] = size
 		self.start: datetime = start
-		self.event: Event = event
-		self.playlist_set: PlaylistSet = playlist_set
+		self.ended: bool = ended
+		self.event: Optional[Event] = event
+		self.playlist_set: Optional[PlaylistSet] = playlist_set
 		self.cards: Optional[list[Card]] = cards
 
 
@@ -48,9 +50,10 @@ class Round:
 		return Round(
 			id=round_dict["id"],
 			name=round_dict["name"],
-			size=round_dict["date"],
+			size=round_dict["size"],
 			start=round_dict["start"],
+			ended=round_dict["ended"],
 			event=round_dict.get("event"),
-			playlist_set=round_dict["playlist_set"],
+			playlist_set=round_dict.get("playlist_set"),
 			cards=round_dict.get("cards"),
 		)

@@ -17,6 +17,7 @@ __author__ = "MPZinke"
 import psycopg2.extras
 
 
+import database
 from database.connect import connect
 from spotify.classes import Playlist, Song
 
@@ -57,6 +58,17 @@ def select_playlist(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist
 	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (id,))
 	playlist.songs = [Song.from_dict({**song_dict, "playlist": playlist}) for song_dict in cursor]
+
+	return playlist
+
+
+@connect
+def select_playlist_and_songs(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist:
+	query = """SELECT * FROM "Playlists" WHERE "id" = %s AND "is_deleted" = FALSE;"""
+	cursor.execute(query, (id,))
+
+	playlist: Playlist = Playlist.from_dict(cursor.fetchone())
+	database.song.select_songs_for_playlist(playlist)
 
 	return playlist
 

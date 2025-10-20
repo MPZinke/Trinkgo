@@ -75,7 +75,7 @@ def POST_events_new():
 @events_blueprint.get("/events/<int:id>")
 # @authorize
 def GET_events_event(id: int):
-	event: Event = database.event.select_event(id)
+	event: Event = database.event.select_event_and_rounds(id)
 
 	return render_template("events/event/index.j2", event=event)
 
@@ -83,7 +83,7 @@ def GET_events_event(id: int):
 @events_blueprint.get("/events/<int:id>/rounds")
 # @authorize
 def GET_events_event_rounds(id: int):
-	event: Event = database.event.select_event(id)
+	event: Event = database.event.select_event_and_rounds(id)
 
 	return render_template("events/event/rounds/index.j2", event=event)
 
@@ -111,6 +111,7 @@ def POST_events_event_rounds_new(id: int):
 		name=name,
 		size=size,
 		start=None,
+		ended=False,
 		event=Event(id=id,name=None,date=None,start=None,ended=None,rounds=None),
 		playlist_set=PlaylistSet(id=playlist_set_id, name=None, playlist=None, songs=None),
 		cards=None,
@@ -124,6 +125,31 @@ def POST_events_event_rounds_new(id: int):
 @events_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>")
 # @authorize
 def GET_events_event_rounds_round(event_id: int, round_id: int):
-	round: Round = database.round.select_round(round_id)
+	round: Round = database.round.select_round_all(round_id)
 
 	return render_template("events/event/rounds/round/index.j2", round=round)
+
+
+@events_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards")
+# @authorize
+def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
+	round: Round = database.round.select_round_all(round_id)
+
+	return render_template("events/event/rounds/round/cards/index.j2", round=round)
+
+
+@events_blueprint.post("/events/<int:event_id>/rounds/<int:round_id>/cards/new")
+# @authorize
+def GET_events_event_rounds_round_cards_new(event_id: int, round_id: int):
+	round: Round = database.round.select_round_all(round_id)
+
+	return render_template("events/event/rounds/round/cards/index.j2", round=round)
+
+
+@events_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/<int:card_id>")
+# @authorize
+def GET_events_event_rounds_round_cards_card(event_id: int, round_id: int, card_id: int):
+	# TODO: Display card PDF
+	round: Round = database.round.select_round_all(round_id)
+
+	return render_template("events/event/rounds/round/cards/index.j2", round=round)

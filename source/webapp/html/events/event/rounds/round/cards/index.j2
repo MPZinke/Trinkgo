@@ -29,30 +29,20 @@
 			>
 				Rounds
 			</a>
-			&gt; {{ round.name }}
+			&gt;
+			<a
+				href="/events/{{ round.event.id }}/rounds/{{ round.id }}"
+			>
+				{{ round.name }}
+			</a>
+			&gt; Cards
 		</header>
 
 		<h1>
-			{{ round.event.name }} ({{ round.event.date }}) {{ round.name }}
+			{{ round.event.name }} ({{ round.event.date }}) {{ round.name }} Cards
 		</h1>
 
-		<h2>
-			<a
-				href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards"
-			>
-				Cards
-			</a>
-		</h2>
-
 		<table>
-			<tr>
-				<td>
-					Playlist Set
-				</td>
-				<td>
-					{{ round.playlist_set.name }}
-				</td>
-			</tr>
 			<tr>
 				<td>
 					Size
@@ -61,23 +51,11 @@
 					{{ round.size }}
 				</td>
 			</tr>
-			<tr>
-				<td>
-					Started
-				</td>
-				<td>
-					{{ round.start }}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Ended
-				</td>
-				<td>
-					{{ round.ended }}
-				</td>
-			</tr>
 		</table>
+
+		<h2>
+			Cards
+		</h2>
 
 		<table>
 			<tr>

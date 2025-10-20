@@ -53,7 +53,23 @@ def select_playlist_set(cursor: psycopg2.extras.RealDictCursor, id: str) -> Play
 		  AND "PlaylistsSets"."is_deleted" = FALSE;
 	"""
 	cursor.execute(query, (id,))
-	playlist_set: PlaylistSet = PlaylistSet.from_dict(cursor.fetchone())
+	return PlaylistSet.from_dict(cursor.fetchone())
+
+
+@connect
+def select_playlist_set_and_songs(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist:
+	query = """
+		SELECT
+			"PlaylistsSets".*,
+			"Playlists"."name" AS "Playlists.name",
+			"Playlists"."uri" AS "Playlists.uri"
+		FROM "PlaylistsSets"
+		JOIN "Playlists" ON "PlaylistsSets"."Playlists.id" = "Playlists"."id"
+		WHERE "PlaylistsSets"."id" = %s
+		  AND "PlaylistsSets"."is_deleted" = FALSE;
+	"""
+	cursor.execute(query, (id,))
+	playlist_set: PlaylistSet = PlaylistSet.from_dict({**cursor.fetchone(), "songs": []})
 
 	query = """
 		SELECT
@@ -64,10 +80,11 @@ def select_playlist_set(cursor: psycopg2.extras.RealDictCursor, id: str) -> Play
 			"Songs"."artists" AS "Songs.artists",
 			"Songs"."artwork" AS "Songs.artwork",
 			"Songs"."length" AS "Songs.length"
-		FROM "SongsSets" 
+		FROM "SongsSets"
 		JOIN "Songs" ON "SongsSets"."Songs.id" = "Songs"."id"
 		WHERE "SongsSets"."PlaylistsSets.id" = %s
-		  AND "SongsSets"."is_deleted" = FALSE;
+		  AND "SongsSets"."is_deleted" = FALSE
+		ORDER BY "id" ASC;
 	"""
 
 	cursor.execute(query, (id,))

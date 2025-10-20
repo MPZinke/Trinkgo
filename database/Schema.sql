@@ -71,6 +71,7 @@ CREATE TABLE "Rounds"
 	"name" TEXT NOT NULL,
 	"size" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
 	"start" TIMESTAMP DEFAULT NULL,
+	"ended" BOOLEAN DEFAULT FALSE,
 	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
 	"Events.id" INT NOT NULL,
 	"PlaylistsSets.id" INT NOT NULL,

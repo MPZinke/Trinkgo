@@ -4,7 +4,7 @@ import psycopg2.extras
 
 
 from database.connect import connect
-from spotify.classes import Song
+from spotify.classes import Playlist, Song
 
 
 @connect
@@ -14,6 +14,13 @@ def select_song(cursor: psycopg2.extras.RealDictCursor, playlist_id: str, id: st
 	song_dict = cursor.fetchone()
 
 	return Song.from_dict(song_dict)
+
+
+@connect
+def select_songs_for_playlist(cursor: psycopg2.extras.RealDictCursor, playlist: Playlist) -> None:
+	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "is_deleted" = FALSE;"""
+	cursor.execute(query, (playlist.id,))
+	playlist.songs = [Song.from_dict({**song_dict, "playlist": playlist}) for song_dict in cursor]
 
 
 @connect

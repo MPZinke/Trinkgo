@@ -28,6 +28,7 @@
 
 		<a
 			href="https://open.spotify.com/playlist/{{ playlist.uri }}"
+			target="_blank"
 		>
 			Open In Spotify
 		</a>
@@ -69,29 +70,13 @@
 				Songs
 			</a>
 		</h2>
+
 		<table>
 			{% for song in playlist.songs %}
 				{{ render_song(loop.index, song) }}
 			{% endfor %}
 		</table>
 
-		<form
-			method="POST"
-			action="/playlists/{{ playlist.id }}"
-		>
-			<input
-				id="number_of_boards-input"
-				name="number_of_boards-input"
-				type="number"
-				value="1"
-				min="1"
-			/>
-			<button
-				onclick=""
-			>
-				Create Boards
-			</button>
-		</form>
 	</body>
 </html>
 

@@ -17,41 +17,41 @@ __author__ = "MPZinke"
 import psycopg2.extras
 
 
-import database
 from database.connect import connect
-from trinkgo.classes import Event, Round
+import database
+from trinkgo.classes import Card, Event, PlaylistSet, Round
 
 
 @connect
-def insert_event(cursor: psycopg2.extras.RealDictCursor, event: Event):
-	query = """INSERT INTO "Events" ("name", "date") VALUES (%s, %s) RETURNING "id";"""
-	cursor.execute(query, (event.name, event.date))
-	event.id = cursor.fetchone()["id"]
+def insert_card(cursor: psycopg2.extras.RealDictCursor, card: Card):
+	query = """
+		INSERT INTO "Cards" ("name", "size", "Events.id", "PlaylistsSets.id")
+		VALUES (%s, %s, %s, %s) RETURNING "id";
+	"""
+	cursor.execute(query, (card.name, card.size, card.event.id, card.playlist_set.id))
+	card.id = cursor.fetchone()["id"]
 
 
 @connect
-def select_event(cursor: psycopg2.extras.RealDictCursor, id: str) -> Event:
-	query = """SELECT * FROM "Events" WHERE "id" = %s AND "is_deleted" = FALSE;"""
+def select_card(cursor: psycopg2.extras.RealDictCursor, id: str) -> Card:
+	query = """SELECT * FROM "Cards" WHERE "id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (id,))
-	event_dict: dict = cursor.fetchone()
+	card_dict: dict = cursor.fetchone()
 
-	event: Event = Event.from_dict(event_dict)
-	return event
-
-
-@connect
-def select_event_and_rounds(cursor: psycopg2.extras.RealDictCursor, id: str) -> Event:
-	query = """SELECT * FROM "Events" WHERE "id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (id,))
-
-	event: Event = Event.from_dict(cursor.fetchone())
-	database.round.select_rounds_for_event(event)
-
-	return event
+	card: Card = Card.from_dict(card_dict)
+	return card
 
 
 @connect
-def select_events(cursor: psycopg2.extras.RealDictCursor) -> list[Event]:
-	query = """SELECT * FROM "Events" WHERE "is_deleted" = FALSE;"""
+def select_cards(cursor: psycopg2.extras.RealDictCursor) -> list[Card]:
+	query = """SELECT * FROM "Cards" WHERE "is_deleted" = FALSE;"""
 	cursor.execute(query)
-	return [Event.from_dict(event_dict) for event_dict in cursor]
+	return [Card.from_dict(card_dict) for card_dict in cursor]
+
+
+@connect
+def select_cards_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
+	query = """SELECT * FROM "Cards" WHERE "Rounds.id" = %s AND "is_deleted" = FALSE;"""
+	cursor.execute(query, (round.id,))
+
+	round.cards = [Card.from_dict({**card_dict, "round": round}) for card_dict in cursor]

@@ -14,13 +14,16 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from typing import Tuple
+from typing import Tuple, TypeVar
 
 
 from PIL import Image, ImageDraw, ImageFont
 
 
 from spotify.classes import Song
+
+
+Round = TypeVar("Round")
 
 
 class Card:
@@ -38,6 +41,12 @@ class Card:
 	@staticmethod
 	def from_dict(card_dict: dict) -> object:
 		...
+
+
+	@staticmethod
+	def new(round: Round, number_of_boards: int) -> list[object]:
+		for x in range(number_of_boards):
+			...
 
 
 	def save(self):
