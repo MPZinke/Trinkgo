@@ -44,11 +44,12 @@ def api_play_song():
 	song = Song(
 		id=0,
 		uri=uri,
-		name=None,
+		title=None,
 		album=None,
 		artists=None,
 		artwork=None,
 		length=None,
+		released=None,
 		playlist=None,
 	)
 
@@ -56,16 +57,16 @@ def api_play_song():
 	return ("", 204)
 
 
-@api_blueprint.post("/api/song/save")
+@api_blueprint.post("/api/set_song/save")
 @authorize
 def api_song_save():
 	request_json = request.json
 	playlist_id: str = request_json.get("playlist_id")
-	song_id: str = request_json.get("song_id")
+	set_song_id: str = request_json.get("set_song_id")
 	start: int = request_json.get("start")
 	duration: int = request_json.get("duration")
 
-	database.song.update_song_start_and_duration(song_id, start, duration)
+	database.song.update_song_start_and_duration(set_song_id, start, duration)
 
 	return ("", 204)
 

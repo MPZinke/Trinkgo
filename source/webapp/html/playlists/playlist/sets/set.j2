@@ -23,7 +23,7 @@
 			<a
 				href="/playlists/{{ playlist_set.playlist.id }}"
 			>
-				{{ playlist_set.playlist.name }}
+				{{ playlist_set.playlist.title }}
 			</a>
 			&gt;
 			<a
@@ -35,7 +35,7 @@
 		</header>
 
 		<h1>
-			'{{ playlist_set.playlist.name }}' {{ playlist_set.name }} Set
+			'{{ playlist_set.playlist.title }}' {{ playlist_set.name }} Set
 		</h1>
 
 		<a
@@ -46,7 +46,7 @@
 		</a>
 
 		<table>
-			{% for song in playlist_set.songs %}
+			{% for song in playlist_set.set_songs %}
 				{{ render_set_song(loop.index, song) }}
 			{% endfor %}
 		</table>
@@ -118,9 +118,9 @@
 		let duration = document.getElementById(`song_duration-${uri}-input`).value;
 
 		let xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("POST", `/api/song/save`, false);
+		xmlhttp.open("POST", `/api/set_song/save`, false);
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify({playlist_id, song_id: id, start, duration}));
+		xmlhttp.send(JSON.stringify({playlist_id, set_song_id: id, start, duration}));
 
 		if(xmlhttp.status != 204)
 		{

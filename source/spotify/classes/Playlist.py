@@ -23,19 +23,19 @@ from spotify.classes import Song
 
 
 class Playlist:
-	def __init__(self, id: int, uri: str, name: str, songs: list[Song]):
+	def __init__(self, id: int, uri: str, title: str, songs: list[Song]):
 		self.id: int = id
 		self.uri: str = uri
-		self.name: str = name
-		self.songs: list[Song] = songs.copy()
+		self.title: str = title
+		self.songs: list[Song] = songs.copy() if(songs is not None) else None
 
 
 	def __iter__(self):
 		yield from {
 			"id": self.id,
 			"uri": self.uri,
-			"name": self.name,
-			"songs": list(map(dict, self.songs)),
+			"title": self.title,
+			"songs": list(map(dict, self.songs)) if(self.songs is not None) else None,
 		}.items()
 
 
@@ -48,6 +48,6 @@ class Playlist:
 		return Playlist(
 			id=playlist_dict["id"],
 			uri=playlist_dict["uri"],
-			name=playlist_dict["name"],
-			songs=playlist_dict.get("songs", [])
+			title=playlist_dict["title"],
+			songs=playlist_dict.get("songs")
 		)

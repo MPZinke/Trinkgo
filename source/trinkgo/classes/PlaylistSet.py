@@ -18,24 +18,24 @@ import json
 from typing import Optional
 
 
-from spotify.classes import Playlist, Song
+from spotify.classes import Playlist
 from trinkgo.classes import SetSong
 
 
 class PlaylistSet:
-	def __init__(self, id: int, name: str, playlist: Optional[Playlist], songs: list[SetSong]|None):
+	def __init__(self, id: int, name: str, playlist: Playlist, set_songs: list[SetSong]):
 		self.id: int = id
 		self.name: str = name
-		self.playlist: Optional[Playlist] = playlist
-		self.songs: list[SetSong]|None = songs.copy() if(songs is not None) else None
+		self.playlist: Playlist = playlist
+		self.set_songs: list[SetSong] = set_songs.copy() if(set_songs is not None) else None
 
 
 	def __iter__(self):
 		yield from {
 			"id": self.id,
 			"name": self.name,
-			"playlist": self.playlist if(self.playlist is not None) else None,
-			"songs": list(map(dict, self.songs)) if(self.songs is not None) else None,
+			"playlist": dict(self.playlist) if(self.playlist is not None) else None,
+			"set_songs": list(map(dict, self.set_songs)) if(self.set_songs is not None) else None,
 		}.items()
 
 
@@ -48,11 +48,6 @@ class PlaylistSet:
 		return PlaylistSet(
 			id=playlist_set_dict["id"],
 			name=playlist_set_dict["name"],
-			playlist=Playlist(
-				id=playlist_set_dict["Playlists.id"],
-				name=playlist_set_dict["Playlists.name"],
-				uri=playlist_set_dict["Playlists.name"],
-				songs=[],
-			),
-			songs=playlist_set_dict.get("songs")
+			playlist=playlist_set_dict.get("playlist"),
+			set_songs=playlist_set_dict.get("set_songs")
 		)

@@ -57,16 +57,6 @@ class SetSong:
 			id=set_song_dict["id"],
 			start=set_song_dict["start"],
 			duration=set_song_dict["duration"],
-			song=Song(
-				id=set_song_dict["Songs.id"],
-				uri=set_song_dict["Songs.uri"],
-				name=set_song_dict["Songs.name"],
-				album=set_song_dict["Songs.album"],
-				artists=set_song_dict["Songs.artists"],
-				artwork=set_song_dict["Songs.artwork"],
-				length=set_song_dict["Songs.length"],
-				playlist=set_song_dict.get("Songs.playlist"),
-			),
+			song=set_song_dict["song"],
 			playlist_set=set_song_dict.get("playlist_set"),
 		)
-		

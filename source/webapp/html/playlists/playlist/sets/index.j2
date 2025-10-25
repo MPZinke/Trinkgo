@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<title>
-		{{ playlist.name }} Sets
+		{{ playlist.title }} Sets
 	</title>
 
 	<body>
@@ -21,13 +21,13 @@
 			<a
 				href="/playlists/{{ playlist.id }}"
 			>
-				{{ playlist.name }}
+				{{ playlist.title }}
 			</a>
 			&gt; Sets
 		</header>
 
 		<h1>
-			Playlists Sets For {{ playlist.name }}
+			Playlists Sets For {{ playlist.title }}
 		</h1>
 		<a
 			href="/playlists/{{ playlist.id }}/new"
@@ -44,10 +44,6 @@
 						>
 							{{ playlist_set.name }}
 						</a>
-					</td>
-					<td>
-						<input />
-						<button>Create Boards</button> TODO
 					</td>
 				</tr>
 			{% endfor %}

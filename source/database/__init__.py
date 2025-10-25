@@ -14,4 +14,4 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from database import cards, event, playlist, playlist_set, round, song
+from database import card, event, playlist, playlist_set, round, set_song, song

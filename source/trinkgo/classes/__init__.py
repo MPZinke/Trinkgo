@@ -14,7 +14,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from trinkgo.classes.Card import Card
+from trinkgo.classes.Card import Card, CardSetSongs
 from trinkgo.classes.Event import Event
 from trinkgo.classes.PlaylistSet import PlaylistSet
 from trinkgo.classes.Round import Round

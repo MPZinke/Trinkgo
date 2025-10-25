@@ -38,49 +38,74 @@
 		<form
 			method="POST"
 		>
-			Name
-			<input
-				name="round_name-input"
-			/>
-
-			<br/>
-
-			Playlist Set
-			<select
-				name="playlist_set-select"
-			>
-				<option
-					hidden
-					selected
-				></option>
-				{% for playlist_set in playlist_sets %}
-					<option
-						value="{{ playlist_set.id }}"
-					>
-						{{ playlist_set.name }}
-					</option>
-				{% endfor %}
-			</select>
-
-			<br/>
-
-			Board Size
-			Width
-			<input
-				name="round_size_columns-input"
-				type="number"
-				min="1"
-				value="5"
-			/>
-			Height
-			<input
-				name="round_size_rows-input"
-				type="number"
-				min="1"
-				value="5"
-			/>
-
-			<br/>
+			<table>
+				<tr>
+					<td>
+						Name
+					</td>
+					<td>
+						<input
+							name="round_name-input"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Playlist Set
+					</td>
+					<td>
+						<select
+							name="playlist_set-select"
+						>
+							<option
+								hidden
+								selected
+							></option>
+							{% for playlist_set in playlist_sets %}
+								<option
+									value="{{ playlist_set.id }}"
+								>
+									{{ playlist_set.name }}
+								</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Board Size
+					</td>
+					<td>
+						Rows
+						<input
+							name="round_size_rows-input"
+							type="number"
+							min="1"
+							value="5"
+						/>
+						Columns
+						<input
+							name="round_size_columns-input"
+							type="number"
+							min="1"
+							value="5"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Number Of Cards
+					</td>
+					<td>
+						<input
+							name="number_of_cards-input"
+							type="number"
+							min="0"
+							value="0"
+						/>
+					</td>
+				</tr>
+			</table>
 
 			<button>
 				Create

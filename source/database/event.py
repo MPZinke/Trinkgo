@@ -17,7 +17,6 @@ __author__ = "MPZinke"
 import psycopg2.extras
 
 
-import database
 from database.connect import connect
 from trinkgo.classes import Event, Round
 
@@ -48,6 +47,18 @@ def select_event_and_rounds(cursor: psycopg2.extras.RealDictCursor, id: str) -> 
 	database.round.select_rounds_for_event(event)
 
 	return event
+
+
+@connect
+def select_event_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
+	query = """
+		SELECT "Events".*
+		FROM "Rounds"
+		JOIN "Events" ON "Rounds"."Events.id" = "Events"."id"
+		WHERE "Rounds"."id" = %s;"""
+	cursor.execute(query, (round.id,))
+
+	round.event = Event.from_dict({"round": round, **cursor.fetchone()})
 
 
 @connect

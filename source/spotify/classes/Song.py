@@ -14,7 +14,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from datetime import datetime, timedelta
+from datetime import date as date_type, datetime, timedelta
 import json
 from typing import Optional
 
@@ -24,20 +24,22 @@ class Song:
 		self,
 		id: int,
 		uri: str,
-		name: str,
+		title: str,
 		album: str,
 		artists: str,
 		artwork: str,
 		length: int,
+		released: date_type,
 		playlist: Optional[object],
 	):
 		self.id: int = id
 		self.uri: str = uri
-		self.name: str = name
+		self.title: str = title
 		self.album: str = album
 		self.artists: str = artists
 		self.artwork: str = artwork
 		self.length: int = length
+		self.released: date_type = released
 		self.playlist: Optional[object] = playlist
 
 
@@ -45,11 +47,12 @@ class Song:
 		yield from {
 			"id": self.id,
 			"uri": self.uri,
-			"name": self.name,
+			"title": self.title,
 			"album": self.album,
 			"artists": self.artists,
 			"artwork": self.artwork,
 			"length": self.length,
+			"released": self.released,
 			"playlist": self.playlist.id if(self.playlist is not None) else None,
 		}.items()
 
@@ -63,11 +66,12 @@ class Song:
 		return Song(
 			id=song_dict["id"],
 			uri=song_dict["uri"],
-			name=song_dict["name"],
+			title=song_dict["title"],
 			album=song_dict["album"],
 			artists=song_dict["artists"],
 			artwork=song_dict["artwork"],
 			length=song_dict["length"],
+			released=song_dict["released"],
 			playlist=song_dict.get("playlist"),
 		)
 

@@ -17,9 +17,7 @@ __author__ = "MPZinke"
 import psycopg2.extras
 
 
-import database
 from database.connect import connect
-import database
 from trinkgo.classes import Card, Event, PlaylistSet, Round
 
 
@@ -40,17 +38,6 @@ def select_round(cursor: psycopg2.extras.RealDictCursor, id: str) -> Round:
 	round_dict: dict = cursor.fetchone()
 
 	round: Round = Round.from_dict(round_dict)
-	return round
-
-
-@connect
-def select_round_and_cards(cursor: psycopg2.extras.RealDictCursor, id: str) -> Round:
-	query = """SELECT * FROM "Rounds" WHERE "id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (id,))
-	round: Round = Round.from_dict(cursor.fetchone())
-
-	database.cards.select_cards_for_round(round)
-
 	return round
 
 

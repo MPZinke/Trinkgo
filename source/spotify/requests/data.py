@@ -14,6 +14,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
+from datetime import date as date_type
 import requests
 
 
@@ -24,7 +25,7 @@ from spotify.classes import Playlist, Song
 def get_playlist(tokens: Tokens, uri: str) -> Playlist:
 	url = (
 		f"https://api.spotify.com/v1/playlists/{uri}"
-		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,artists(name))"
+		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,album.release_date,artists(name))"
 	)
 	headers = {"Authorization": f"Bearer {tokens.access_token}"}
 	response: requests.Response = requests.get(url, headers=headers)
@@ -32,7 +33,7 @@ def get_playlist(tokens: Tokens, uri: str) -> Playlist:
 
 	playlist_info = response.json()
 
-	playlist = Playlist(id=0, uri=uri, name=playlist_info["name"], songs=[])
+	playlist = Playlist(id=0, uri=uri, title=playlist_info["name"], songs=[])
 	for song_info in playlist_info["tracks"]["items"]:
 		track = song_info["track"]
 
@@ -45,11 +46,12 @@ def get_playlist(tokens: Tokens, uri: str) -> Playlist:
 		song = Song(
 			id=0,
 			uri=track["id"],
-			name=track["name"],
+			title=track["name"],
 			album=track["album"]["name"],
 			artists=artists,
 			artwork=artwork,
 			length=track["duration_ms"],
+			released=track["album"]["release_date"],
 			playlist=playlist,
 		)
 		playlist.songs.append(song)

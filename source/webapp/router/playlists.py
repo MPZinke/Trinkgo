@@ -52,7 +52,8 @@ def POST_playlists_new():
 @playlists_blueprint.get("/playlists/<int:id>")
 @authorize
 def GET_playlists_playlist(id: int):
-	playlist: Playlist = database.playlist.select_playlist_and_songs(id)
+	playlist: Playlist = database.playlist.select_playlist(id)
+	database.song.select_songs_for_playlist(playlist)
 	playlist_sets: list[PlaylistSet] = database.playlist_set.select_playlist_sets()
 
 	return render_template("playlists/playlist/index.j2", playlist=playlist, playlist_sets=playlist_sets)
@@ -92,16 +93,17 @@ def POST_playlists_playlist_sets_new(id: int):
 	set_name = request.form.get("set_name-input")
 
 	playlist = database.playlist.select_playlist(id)
-	playlist_set = PlaylistSet(id=0, name=set_name, playlist=playlist, songs=[])
+	playlist_set = PlaylistSet(id=0, name=set_name, playlist=playlist, set_songs=[])
 
 	database.playlist_set.insert_set(playlist_set)
 
-	return redirect(f"playlists/{id}/sets/{playlist_set.id}")
+	return redirect(f"/playlists/{id}/sets/{playlist_set.id}")
 
 
 @playlists_blueprint.get("/playlists/<int:playlist_id>/sets/<int:playlist_set_id>")
 @authorize
 def GET_playlists_playlist_sets_set(playlist_id: int, playlist_set_id: int):
-	playlist_set = database.playlist_set.select_playlist_set_and_songs(playlist_set_id)
+	playlist_set = database.playlist_set.select_playlist_set(playlist_set_id)
+	database.set_song.select_set_songs(playlist_set)
 
 	return render_template("playlists/playlist/sets/set.j2", playlist_set=playlist_set)
