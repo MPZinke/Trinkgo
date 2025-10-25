@@ -25,7 +25,7 @@ import requests
 import database
 import spotify
 from trinkgo.create_card import create_card
-from trinkgo.classes import Event, PlaylistSet, Round
+from trinkgo.classes import Card, Event, PlaylistSet, Round
 from webapp.router import app
 from webapp.router.auth import authorize
 
@@ -80,7 +80,7 @@ def GET_events_event_rounds_round_cards_card(event_id: int, round_id: int, card_
 	database.playlist_set.select_playlist_set_for_round(card.round)
 	database.set_song.select_set_songs_for_playlist_set(card.round.playlist_set)
 	database.card.select_card_songs(card, card.round.playlist_set)
-	# TODO
+
 	card.pdf()
 
 	return render_template("events/event/rounds/round/cards/card.j2", card=card)

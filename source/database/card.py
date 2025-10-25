@@ -109,7 +109,8 @@ def select_card_songs(cursor: psycopg2.extras.RealDictCursor, card: Card, playli
 	cursor.execute(query, (card.id,))
 
 	for card_song_dict in cursor:
-		set_song = next(set_song for set_song in playlist_set.set_songs)
+		set_song = next(set_song for set_song in playlist_set.set_songs if(set_song.id == card_song_dict["SongsSets.id"]))
+		print(set_song.song.title)
 		position = card_song_dict["position"]
 		card.set_songs[position[0]][position[1]] = set_song
 

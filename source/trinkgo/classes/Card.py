@@ -96,12 +96,6 @@ class Card:
 		)
 
 
-	@staticmethod
-	def new(round: Round, number_of_boards: int) -> list[object]:
-		for x in range(number_of_boards):
-			...
-
-
 	def pdf(self):
 		def center_text(
 			draw,
@@ -129,18 +123,11 @@ class Card:
 		header = f"{self.round.event.name} - {self.round.name} - {self.identifier}"
 		center_text(draw, [width // 2, 82], header, ImageFont.load_default(64))
 		for x, row in enumerate(self.set_songs):
-			center_x = x * square_width + margin
+			x_start = x * square_width + margin
 			for y, set_song in enumerate(row):
-				center_y = y * square_height + header_space + margin
-				draw.rectangle([(center_x, center_y), (center_x+square_width, center_y+square_height)])
-				# center_text(draw, [center_x+half_square_width, center_y+half_square_height], "SONG")
-				if(set_song is not None):
-					print(set_song.song.title)
-					center_text(draw, [x+half_square_width, y+half_square_height], set_song.song.title)
+				y_start = y * square_height + header_space + margin
+				draw.rectangle([(x_start, y_start), (x_start+square_width, y_start+square_height)])
+				text = "Free" if(set_song is None) else set_song.song.title
+				center_text(draw, [x_start+half_square_width, y_start+half_square_height], text)
 
 		image.save("/Users/mpzinke/Downloads/Test.jpg")
-
-
-	def save(self):
-		square_size = 400
-		half_square_size = square_size // 2
