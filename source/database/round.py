@@ -67,3 +67,15 @@ def select_rounds_for_event(cursor: psycopg2.extras.RealDictCursor, event: Event
 	query = """SELECT * FROM "Rounds" WHERE "Events.id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (event.id,))
 	event.rounds = [Round.from_dict({**round_dict, "event": event}) for round_dict in cursor]
+
+
+@connect
+def select_round_for_card(cursor: psycopg2.extras.RealDictCursor, card: Round) -> None:
+	query = """
+		SELECT *
+		FROM "Rounds"
+		WHERE "id" = (SELECT "Rounds.id" FROM "Cards" WHERE "id" = %s);
+	"""
+	cursor.execute(query, (card.id,))
+
+	card.round = Round.from_dict({"cards": [card], **cursor.fetchone()})

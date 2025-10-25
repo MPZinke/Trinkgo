@@ -38,7 +38,7 @@ class CardSetSongs:
 
 
 	def __iter__(self) -> list:
-		return self.set_songs
+		return iter(self.set_songs)
 
 
 	def __getitem__(self, key: int|Tuple[int, int]) -> Optional[SetSong]|list[Optional[SetSong]]:
@@ -81,8 +81,7 @@ class Card:
 
 		# self.width = 2480
 		# self.height = 3508
-		# self.image = Image.new("1", [self.width, self.height], 1)
-		# self.draw = ImageDraw.Draw(self.image)
+
 		# print(self.set_songs)  # TESTING
 
 
@@ -103,27 +102,45 @@ class Card:
 			...
 
 
+	def pdf(self):
+		def center_text(
+			draw,
+			center: Tuple[int, int],
+			text: str,
+			font: ImageFont=ImageFont.load_default(32),
+			limit: int=None
+		):
+			text_width = draw.textlength(text, font=font)
+			draw.text((center[0] - text_width//2, center[1] - font.size//2), text=text, font=font)
+
+		width = 2480
+		height = 3508
+		margin = 50
+		header_space = 300
+
+		square_width = (width - (margin * 2)) // self.size[1]
+		square_height = (height - header_space - (margin * 2)) // self.size[0]
+		half_square_width = square_width // 2
+		half_square_height = square_height // 2
+
+		image = Image.new("1", [width, height], 1)
+		draw = ImageDraw.Draw(image)
+
+		header = f"{self.round.event.name} - {self.round.name} - {self.identifier}"
+		center_text(draw, [width // 2, 82], header, ImageFont.load_default(64))
+		for x, row in enumerate(self.set_songs):
+			center_x = x * square_width + margin
+			for y, set_song in enumerate(row):
+				center_y = y * square_height + header_space + margin
+				draw.rectangle([(center_x, center_y), (center_x+square_width, center_y+square_height)])
+				# center_text(draw, [center_x+half_square_width, center_y+half_square_height], "SONG")
+				if(set_song is not None):
+					print(set_song.song.title)
+					center_text(draw, [x+half_square_width, y+half_square_height], set_song.song.title)
+
+		image.save("/Users/mpzinke/Downloads/Test.jpg")
+
+
 	def save(self):
 		square_size = 400
 		half_square_size = square_size // 2
-
-		self.center_text([square_size * 3, half_square_size], self.round.name, ImageFont.load_default(64))
-		for x, row in enumerate(self.set_set_songs):
-			x = x * square_size + half_square_size
-			for y, col in enumerate(row):
-				y = (y+1) * square_size
-				self.draw.rectangle([(x, y), (x+square_size, y+square_size)])
-				self.center_text([x+half_square_size, y+half_square_size], col.name)
-
-		self.image.save("/Users/mpzinke/Downloads/Test.jpg")
-
-
-	def center_text(
-		self,
-		center: Tuple[int, int],
-		text: str,
-		font: ImageFont=ImageFont.load_default(32),
-		limit: int=None
-	):
-		text_width = self.draw.textlength(text, font=font)
-		self.draw.text((center[0] - text_width//2, center[1] - font.size//2), text=text, font=font)

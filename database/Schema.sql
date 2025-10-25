@@ -95,8 +95,8 @@ CREATE TABLE "Cards"
 );
 
 
-DROP TABLE IF EXISTS "CardsSongs" CASCADE;
-CREATE TABLE "CardsSongs"
+DROP TABLE IF EXISTS "CardsSongsSets" CASCADE;
+CREATE TABLE "CardsSongsSets"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
 	"position" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
@@ -104,6 +104,5 @@ CREATE TABLE "CardsSongs"
 	"Cards.id" INT NOT NULL,
 	UNIQUE ("position", "Cards.id"),
 	FOREIGN KEY ("SongsSets.id") REFERENCES "SongsSets" ("id"),
-	FOREIGN KEY ("Playlists.id") REFERENCES "Playlists" ("id"),
 	FOREIGN KEY ("Cards.id") REFERENCES "Cards" ("id")
 );

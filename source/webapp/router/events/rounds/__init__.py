@@ -70,7 +70,7 @@ def POST_events_event_rounds_new(id: int):
 		start=None,
 		ended=False,
 		event=Event(id=id,name=None,date=None,start=None,ended=None,rounds=None),
-		playlist_set=PlaylistSet(id=playlist_set_id, name=None, playlist=None, songs=None),
+		playlist_set=PlaylistSet(id=playlist_set_id, name=None, playlist=None, set_songs=None),
 		cards=None,
 	)
 

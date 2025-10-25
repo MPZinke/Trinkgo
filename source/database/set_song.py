@@ -23,7 +23,7 @@ from trinkgo.classes import PlaylistSet, SetSong
 
 
 @connect
-def select_set_songs(cursor: psycopg2.extras.RealDictCursor, playlist_set: PlaylistSet):
+def select_set_songs_for_playlist_set(cursor: psycopg2.extras.RealDictCursor, playlist_set: PlaylistSet):
 	query = """
 		SELECT
 			"SongsSets".*,

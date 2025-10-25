@@ -52,10 +52,9 @@ def select_event_and_rounds(cursor: psycopg2.extras.RealDictCursor, id: str) -> 
 @connect
 def select_event_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
 	query = """
-		SELECT "Events".*
-		FROM "Rounds"
-		JOIN "Events" ON "Rounds"."Events.id" = "Events"."id"
-		WHERE "Rounds"."id" = %s;"""
+		SELECT *
+		FROM "Events"
+		WHERE "id" = (SELECT "Events.id" FROM "Rounds" WHERE "id" = %s);"""
 	cursor.execute(query, (round.id,))
 
 	round.event = Event.from_dict({"round": round, **cursor.fetchone()})

@@ -104,6 +104,6 @@ def POST_playlists_playlist_sets_new(id: int):
 @authorize
 def GET_playlists_playlist_sets_set(playlist_id: int, playlist_set_id: int):
 	playlist_set = database.playlist_set.select_playlist_set(playlist_set_id)
-	database.set_song.select_set_songs(playlist_set)
+	database.set_song.select_set_songs_for_playlist_set(playlist_set)
 
 	return render_template("playlists/playlist/sets/set.j2", playlist_set=playlist_set)

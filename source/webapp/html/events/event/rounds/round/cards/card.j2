@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		{{ card.round.event.name }} - {{ card.round.name }} - Cards
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/events"
+			>
+				Events
+			</a>
+			&gt;
+			<a
+				href="/events/{{ card.round.event.id }}"
+			>
+				{{ card.round.event.name }}
+			</a>
+			&gt;
+			<a
+				href="/events/{{ card.round.event.id }}/rounds"
+			>
+				Rounds
+			</a>
+			&gt;
+			<a
+				href="/events/{{ card.round.event.id }}/rounds/{{ card.round.id }}"
+			>
+				{{ card.round.name }}
+			</a>
+			&gt;
+			<a
+				href="/events/{{ card.round.event.id }}/rounds/{{ card.round.id }}/cards"
+			>
+				Cards
+			</a>
+			&gt; {{ card.identifier }}
+		</header>
+
+		<h1>
+			{{ card.round.event.name }} ({{ card.round.event.date }}) - {{ card.round.name }} - Cards
+		</h1>
+
+		<table>
+			<tr>
+				<td>
+					Size
+				</td>
+				<td>
+					{{ card.round.size }}
+				</td>
+			</tr>
+		</table>
+
+		<h2>
+			Cards
+		</h2>
+
+		<table>
+			<tr>
+				<td>
+					<form
+						method="POST"
+						action="/events/{{ card.round.event.id }}/rounds/{{ card.round.id }}/cards/new"
+					>
+						<input
+							name="number_of_cards-input"
+							type="number"
+							min="1"
+						/>
+						<button>
+							+ Create Cards
+						</button>
+					</form>
+				</td>
+			</tr>
+			{% for card in card.round.cards %}
+				<tr>
+					<td>
+						<a
+							href="/events/{{ card.round.event.id }}/rounds/{{ card.round.id }}/cards/{{ card.id }}"
+						>
+							{{ card.identifier }}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

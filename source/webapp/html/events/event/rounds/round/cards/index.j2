@@ -62,16 +62,14 @@
 				<td>
 					<form
 						method="POST"
-						action="/events/{{ round.event.id }}/rounds/cards/new"
+						action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
 					>
 						<input
 							name="number_of_cards-input"
 							type="number"
 							min="1"
 						/>
-						<button
-							href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
-						>
+						<button>
 							+ Create Cards
 						</button>
 					</form>

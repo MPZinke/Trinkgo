@@ -25,10 +25,29 @@ from trinkgo.classes import Card, CardSetSongs, Event, PlaylistSet, Round
 def insert_card(cursor: psycopg2.extras.RealDictCursor, card: Card):
 	query = """
 		INSERT INTO "Cards" ("identifier", "size", "Rounds.id")
-		VALUES (%s, %s, %s, %s) RETURNING "id";
+		VALUES (%s, %s, %s) RETURNING "id";
 	"""
-	cursor.execute(query, (card.identifier, card.size, card.event.id, card.playlist_set.id))
+	cursor.execute(query, (card.identifier, card.size, card.round.id))
 	card.id = cursor.fetchone()["id"]
+
+	query = """
+		INSERT INTO "CardsSongsSets" ("position", "SongsSets.id", "Cards.id")
+		SELECT ARRAY["Temp"."position_x", "Temp"."position_y"]::INTEGER[2], "Temp"."SongsSets.id", "Temp"."Cards.id"
+		FROM UNNEST(%s, %s, %s, %s)
+		  AS "Temp" ("position_x", "position_y", "SongsSets.id", "Cards.id")
+		RETURNING "id";
+	"""
+
+	unnest_values = {"position_x": [], "position_y": [], "SongsSets.id": [], "Cards.id": []}
+	for row_index, row in enumerate(card.set_songs):
+		for column_index, set_song in enumerate(row):
+			if(set_song is not None):
+				unnest_values["position_x"].append(row_index)
+				unnest_values["position_y"].append(column_index)
+				unnest_values["SongsSets.id"].append(set_song.id)
+				unnest_values["Cards.id"].append(card.id)
+
+	cursor.execute(query, tuple(unnest_values.values()))
 
 
 @connect
@@ -52,9 +71,9 @@ def insert_cards(cursor: psycopg2.extras.RealDictCursor, cards: list[Card]):
 		card.id = card_dict["id"]
 
 	query = """
-		INSERT INTO "CardsSongs" ("position", "SongsSets.id", "Cards.id")
+		INSERT INTO "CardsSongsSets" ("position", "SongsSets.id", "Cards.id")
 		SELECT "Temp"."position", "Temp"."SongsSets.id", "Temp"."Cards.id"
-		FROM UNNEST(%s, %s, %s, %s)
+		FROM UNNEST(%s, %s, %s)
 		  AS "Temp" ("position", "SongsSets.id", "Cards.id")
 		RETURNING "id";
 	"""
@@ -74,25 +93,20 @@ def insert_cards(cursor: psycopg2.extras.RealDictCursor, cards: list[Card]):
 @connect
 def select_card(cursor: psycopg2.extras.RealDictCursor, id: str) -> Card:
 	query = """
-		SELECT "Cards".*, "Rounds"."PlaylistsSets.id"
+		SELECT *
 		FROM "Cards"
-		JOIN "Rounds" ON "Cards"."Rounds.id" = "Rounds"."id"
-		WHERE "Cards"."id" = %s;
+		WHERE "id" = %s;
 	"""
 	cursor.execute(query, (id,))
 	card_dict: dict = cursor.fetchone()
 
-	card: Card = Card.from_dict(set_songs=CardSetSongs(card_dict["size"]), **card_dict)
-	playlist_set = database.playlist_set.select_playlist_set(card_dict["PlaylistsSets.id"])
-	select_card_songs(card, playlist_set)
-
-	return card
+	return Card.from_dict(set_songs=CardSetSongs(card_dict["size"]), **card_dict)
 
 
 @connect
 def select_card_songs(cursor: psycopg2.extras.RealDictCursor, card: Card, playlist_set: PlaylistSet) -> None:
-	query = """SELECT * FROM "CardsSongs" WHERE "Cards.id" = %s;"""
-	cursor.execute(query, (id,))
+	query = """SELECT * FROM "CardsSongsSets" WHERE "Cards.id" = %s;"""
+	cursor.execute(query, (card.id,))
 
 	for card_song_dict in cursor:
 		set_song = next(set_song for set_song in playlist_set.set_songs)
@@ -108,10 +122,11 @@ def select_cards_songs(
 ) -> None:
 	query = """
 		SELECT *
-		FROM "CardsSongs"
+		FROM "CardsSongsSets"
 		WHERE "Cards.id" IN %s;
 	"""
-	cursor.execute(query, (tuple(card.id for card in cards),))
+	cards_ids = (0, *[card.id for card in cards])  # Mitigate empty cards SQL syntax issue
+	cursor.execute(query, (cards_ids,))
 	card_song_dicts = list(map(dict, cursor))
 
 	for card in cards:
