@@ -34,20 +34,17 @@ def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[Set
 	return card_songs
 
 
-def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat: bool=False):
+def create_card(round: Round, freespot: bool=True, repeat: bool=False):
 	songs: list[SetSong] = random_songs(round.playlist_set.set_songs, round.size[0]*round.size[1] - int(freespot))
 	card_songs = CardSetSongs(round.size)
-	# TODO: Add repeat card check
 	for row in range(round.size[0]):
 		for column in range(round.size[1]):
-			print(row, column)
 			if(freespot and row == round.size[0] // 2 and column == round.size[1] // 2):
 				continue
 
 			card_songs[row][column] = songs.pop(0)
-			print(card_songs[row][column])
 
-	card = Card(
+	return Card(
 		id=0,
 		identifier=1,
 		size=round.size,
@@ -55,6 +52,16 @@ def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat
 		round=round,
 	)
 
-	database.card.insert_card(card)
 
-	return card
+def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat: bool=False) -> bool:
+	cards: list[Card] = []
+
+	for x in range(number_of_cards):
+		while((card := create_card(round, freespot, repeat)) in cards or card in round.cards):
+			...
+
+		cards.append(card)
+
+	database.card.insert_cards(cards)
+
+	return cards

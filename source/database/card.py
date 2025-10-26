@@ -52,42 +52,44 @@ def insert_card(cursor: psycopg2.extras.RealDictCursor, card: Card):
 
 @connect
 def insert_cards(cursor: psycopg2.extras.RealDictCursor, cards: list[Card]):
+	if(len(cards) == 0):
+		return
+
 	query = """
 		INSERT INTO "Cards" ("identifier", "size", "Rounds.id")
-		SELECT "Temp"."identifier", "Temp"."size", "Temp"."Rounds.id"
-		FROM UNNEST(%s, %s, %s)
-		  AS "Temp" ("identifier", "size", "Rounds.id")
+		SELECT
+			(
+				SELECT TO_HEX(COUNT(id)+"increment") FROM "Cards" WHERE "Rounds.id" = %(round_id)s
+			),
+			%(size)s,
+			%(round_id)s
+		FROM GENERATE_SERIES(1, %(length)s) AS "increment"  -- FROM: https://stackoverflow.com/a/48176915
 		RETURNING "id";
 	"""
-
-	unnest_values = {"identifier": [], "size": [], "rounds": []}
-	for card in cards:
-		for key, values in unnest_values.items():
-			values.append(getattr(key, card))
-
-	cursor.execute(query, set(*unnest_values.values()))
+	cursor.execute(query, {"round_id": cards[0].round.id, "size": cards[0].size, "length": len(cards)})
 
 	for card, card_dict in zip(cards, cursor):
 		card.id = card_dict["id"]
 
 	query = """
 		INSERT INTO "CardsSongsSets" ("position", "SongsSets.id", "Cards.id")
-		SELECT "Temp"."position", "Temp"."SongsSets.id", "Temp"."Cards.id"
-		FROM UNNEST(%s, %s, %s)
-		  AS "Temp" ("position", "SongsSets.id", "Cards.id")
+		SELECT ARRAY["Temp"."position_x", "Temp"."position_y"]::INTEGER[2], "Temp"."SongsSets.id", "Temp"."Cards.id"
+		FROM UNNEST(%s, %s, %s, %s)
+		  AS "Temp" ("position_x", "position_y", "SongsSets.id", "Cards.id")
 		RETURNING "id";
 	"""
 
-	unnest_values = {"position": [], "SongsSets.id": [], "Cards.id": []}
+	unnest_values = {"position_x": [], "position_y": [], "SongsSets.id": [], "Cards.id": []}
 	for card in cards:
 		for row_index, row in enumerate(card.set_songs):
-			for column_index, song in enumerate(row):
-				if(song is not None):
-					unnest_values["position"].append([row_index, column_index])
-					unnest_values["SongsSets.id"].append(song.id)
+			for column_index, set_song in enumerate(row):
+				if(set_song is not None):
+					unnest_values["position_x"].append(row_index)
+					unnest_values["position_y"].append(column_index)
+					unnest_values["SongsSets.id"].append(set_song.id)
 					unnest_values["Cards.id"].append(card.id)
 
-	cursor.execute(query, set(*unnest_values.values()))
+	cursor.execute(query, tuple(unnest_values.values()))
 
 
 @connect

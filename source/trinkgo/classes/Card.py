@@ -39,17 +39,8 @@ class CardSetSongs:
 			self.set_songs: list[list[Optional[SetSong]]] = [set_songs_list.copy() for set_songs_list in self.set_songs]
 
 
-	def __eq__(self, right: object|list[Optional[SetSong]]|list[list[Optional[SetSong]]]) -> bool:
-		if(isinstance(right, CardSetSongs)):
-			right_songs = [song.id if(song is not None) else None for row in right.set_songs for song in row]
-
-		elif(isinstance(next(iter(right), None), list)):
-			right_songs = [song.id if(song is not None) else None for row in right for song in row]
-
-		else:
-			right_songs = right
-
-		return self.set_songs == right_songs
+	def __eq__(self, right: object) -> bool:
+		return self.set_songs == right.set_songs
 
 
 	def __iter__(self) -> list:

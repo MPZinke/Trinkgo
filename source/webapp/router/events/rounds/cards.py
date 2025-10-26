@@ -25,7 +25,7 @@ import requests
 
 import database
 import spotify
-from trinkgo.create_card import create_card
+from trinkgo.create_card import create_cards
 from trinkgo.classes import Card, Event, PlaylistSet, Round
 from webapp.router import app
 from webapp.router.auth import authorize
@@ -60,9 +60,9 @@ def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
 	database.card.select_cards_for_round(round)
 	database.card.select_cards_songs(round.cards, round.playlist_set)
 
-	card = create_card(round)
+	create_cards(round, number_of_cards)
 
-	return redirect(f"/events/{event_id}/rounds/{round_id}/cards/{card.id}")
+	return redirect(f"/events/{event_id}/rounds/{round_id}/cards")
 
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/all")

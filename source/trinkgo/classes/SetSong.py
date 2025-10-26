@@ -37,6 +37,10 @@ class SetSong:
 		self.playlist_set: Optional[object] = playlist_set
 
 
+	def __eq__(self, right: object|None):
+		return isinstance(right, SetSong) and self.id == right.id
+
+
 	def __iter__(self):
 		yield from {
 			"id": self.id,
