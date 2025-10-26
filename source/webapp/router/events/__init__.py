@@ -48,14 +48,13 @@ def GET_events():
 
 @events_blueprint.get("/events/new")
 def GET_events_new():
-	return render_template("events/new.j2")
+	return render_template("events/new.j2", date=date_type.today().strftime("%Y-%m-%d"))
 
 
 @events_blueprint.post("/events/new")
 def POST_events_new():
 	name = request.form.get("event_name-input")
 	date = request.form.get("event_date-input")
-	print(date)
 	date = date_type.fromisoformat(date)
 	event = Event(
 		id=0,

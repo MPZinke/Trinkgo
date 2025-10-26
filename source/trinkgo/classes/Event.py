@@ -40,7 +40,7 @@ class Event:
 
 
 	@staticmethod
-	def from_dict(event_dict: dict):
+	def from_dict(**event_dict: dict):
 		return Event(
 			id=event_dict["id"],
 			name=event_dict["name"],

@@ -46,7 +46,7 @@ class Round:
 
 
 	@staticmethod
-	def from_dict(round_dict: dict):
+	def from_dict(**round_dict: dict):
 		return Round(
 			id=round_dict["id"],
 			name=round_dict["name"],

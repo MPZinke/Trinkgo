@@ -79,30 +79,25 @@
 			<a
 				href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards"
 			>
-				Cards
+				Cards ({{ round.cards | length }})
 			</a>
 		</h2>
 
+		<form
+			method="POST"
+			action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
+		>
+			<input
+				name="number_of_cards-input"
+				type="number"
+				min="1"
+			/>
+			<button>
+				+ Create Cards
+			</button>
+		</form>
+
 		<table>
-			<tr>
-				<td>
-					<form
-						method="POST"
-						action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
-					>
-						<input
-							name="number_of_cards-input"
-							type="number"
-							min="1"
-						/>
-						<button
-							href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
-						>
-							+ Create Cards
-						</button>
-					</form>
-				</td>
-			</tr>
 			{% for card in round.cards %}
 				<tr>
 					<td>

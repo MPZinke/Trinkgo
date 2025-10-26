@@ -44,7 +44,7 @@ class Playlist:
 
 
 	@staticmethod
-	def from_dict(playlist_dict: dict):
+	def from_dict(**playlist_dict: dict):
 		return Playlist(
 			id=playlist_dict["id"],
 			uri=playlist_dict["uri"],

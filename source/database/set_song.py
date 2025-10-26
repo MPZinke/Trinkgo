@@ -56,6 +56,6 @@ def select_set_songs_for_playlist_set(cursor: psycopg2.extras.RealDictCursor, pl
 			released=set_song_dict["Songs.released"],
 			playlist=playlist_set.playlist,
 		)
-		set_song = SetSong.from_dict({**set_song_dict, "song": song, "playlist_set": playlist_set})
+		set_song = SetSong.from_dict(song=song, playlist_set=playlist_set, **set_song_dict)
 		playlist_set.set_songs.append(set_song)
 		playlist_set.playlist.songs.append(song)

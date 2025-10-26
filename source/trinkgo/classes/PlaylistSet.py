@@ -44,7 +44,7 @@ class PlaylistSet:
 
 
 	@staticmethod
-	def from_dict(playlist_set_dict: dict):
+	def from_dict(**playlist_set_dict: dict):
 		return PlaylistSet(
 			id=playlist_set_dict["id"],
 			name=playlist_set_dict["name"],

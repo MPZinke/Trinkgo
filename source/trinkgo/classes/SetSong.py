@@ -52,7 +52,7 @@ class SetSong:
 
 
 	@staticmethod
-	def from_dict(set_song_dict: dict):
+	def from_dict(**set_song_dict: dict):
 		return SetSong(
 			id=set_song_dict["id"],
 			start=set_song_dict["start"],

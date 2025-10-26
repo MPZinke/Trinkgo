@@ -62,7 +62,7 @@ class Song:
 
 
 	@staticmethod
-	def from_dict(song_dict: dict):
+	def from_dict(**song_dict: dict):
 		return Song(
 			id=song_dict["id"],
 			uri=song_dict["uri"],

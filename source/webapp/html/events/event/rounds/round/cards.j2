@@ -53,28 +53,31 @@
 			</tr>
 		</table>
 
+		<a
+			href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/all"
+		>
+			View All Cards
+		</a>
+
+		<form
+			method="POST"
+			action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
+		>
+			<input
+				name="number_of_cards-input"
+				type="number"
+				min="1"
+			/>
+			<button>
+				+ Create Cards
+			</button>
+		</form>
+
 		<h2>
 			Cards
 		</h2>
 
 		<table>
-			<tr>
-				<td>
-					<form
-						method="POST"
-						action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
-					>
-						<input
-							name="number_of_cards-input"
-							type="number"
-							min="1"
-						/>
-						<button>
-							+ Create Cards
-						</button>
-					</form>
-				</td>
-			</tr>
 			{% for card in round.cards %}
 				<tr>
 					<td>

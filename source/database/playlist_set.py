@@ -60,7 +60,7 @@ def select_playlist_set(cursor: psycopg2.extras.RealDictCursor, id: str) -> Play
 		uri=playlist_set_dict["Playlists.uri"],
 		songs=None,
 	)
-	return PlaylistSet.from_dict({**playlist_set_dict, "playlist": playlist})
+	return PlaylistSet.from_dict(playlist=playlist, **playlist_set_dict)
 
 
 @connect
@@ -84,7 +84,7 @@ def select_playlist_set_for_round(cursor: psycopg2.extras.RealDictCursor, round:
 		uri=playlist_set_dict["Playlists.uri"],
 		songs=None,
 	)
-	round.playlist_set = PlaylistSet.from_dict({**playlist_set_dict, "playlist": playlist})
+	round.playlist_set = PlaylistSet.from_dict(playlist=playlist, **playlist_set_dict)
 
 
 @connect

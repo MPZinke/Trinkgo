@@ -58,11 +58,11 @@ def insert_playlist(cursor: psycopg2.extras.RealDictCursor, playlist: Playlist):
 def select_playlist(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist:
 	query = """SELECT * FROM "Playlists" WHERE "id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (id,))
-	playlist: Playlist = Playlist.from_dict(cursor.fetchone())
+	playlist: Playlist = Playlist.from_dict(**cursor.fetchone())
 
 	query = """SELECT * FROM "Songs" WHERE "Playlists.id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (id,))
-	playlist.songs = [Song.from_dict({**song_dict, "playlist": playlist}) for song_dict in cursor]
+	playlist.songs = [Song.from_dict(playlist=playlist, **song_dict) for song_dict in cursor]
 
 	return playlist
 
@@ -71,4 +71,4 @@ def select_playlist(cursor: psycopg2.extras.RealDictCursor, id: str) -> Playlist
 def select_playlists(cursor: psycopg2.extras.RealDictCursor) -> list[Playlist]:
 	query = """SELECT * FROM "Playlists" WHERE "is_deleted" = FALSE;"""
 	cursor.execute(query)
-	return [Playlist.from_dict(playlist_dict) for playlist_dict in cursor]
+	return [Playlist.from_dict(**playlist_dict) for playlist_dict in cursor]

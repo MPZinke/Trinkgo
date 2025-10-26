@@ -25,7 +25,7 @@ from trinkgo.classes import Card, CardSetSongs, Round, SetSong
 
 def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[SetSong]:
 	card_songs = []
-	while(len(card_songs) < 25):
+	while(len(card_songs) < length):
 		random_index = randint(0, len(songs)-1)
 		song = songs[random_index]
 		if(repeat or song not in card_songs):
@@ -34,17 +34,18 @@ def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[Set
 	return card_songs
 
 
-def create_card(round: Round, freespot: bool=True, repeat: bool=False):
+def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat: bool=False):
 	songs: list[SetSong] = random_songs(round.playlist_set.set_songs, round.size[0]*round.size[1] - int(freespot))
-
 	card_songs = CardSetSongs(round.size)
+	# TODO: Add repeat card check
 	for row in range(round.size[0]):
 		for column in range(round.size[1]):
-			print(songs[0].song.title)
-			if(freespot and row == round.size[0] // 2 and column == round.size[1]):
+			print(row, column)
+			if(freespot and row == round.size[0] // 2 and column == round.size[1] // 2):
 				continue
 
 			card_songs[row][column] = songs.pop(0)
+			print(card_songs[row][column])
 
 	card = Card(
 		id=0,

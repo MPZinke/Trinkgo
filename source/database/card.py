@@ -104,15 +104,22 @@ def select_card(cursor: psycopg2.extras.RealDictCursor, id: str) -> Card:
 
 
 @connect
+def select_cards_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
+	query = """SELECT * FROM "Cards" WHERE "Rounds.id" = %s AND "is_deleted" = FALSE;"""
+	cursor.execute(query, (round.id,))
+
+	round.cards = [Card.from_dict(set_songs=CardSetSongs(round.size), round=round, **card_dict) for card_dict in cursor]
+
+
+@connect
 def select_card_songs(cursor: psycopg2.extras.RealDictCursor, card: Card, playlist_set: PlaylistSet) -> None:
 	query = """SELECT * FROM "CardsSongsSets" WHERE "Cards.id" = %s;"""
 	cursor.execute(query, (card.id,))
 
 	for card_song_dict in cursor:
 		set_song = next(set_song for set_song in playlist_set.set_songs if(set_song.id == card_song_dict["SongsSets.id"]))
-		print(set_song.song.title)
 		position = card_song_dict["position"]
-		card.set_songs[position[0]][position[1]] = set_song
+		card.set_songs[position] = set_song
 
 
 @connect
@@ -131,19 +138,10 @@ def select_cards_songs(
 	card_song_dicts = list(map(dict, cursor))
 
 	for card in cards:
-		for card_song_dict in cursor:
+		for card_song_dict in card_song_dicts:
 			if card_song_dict["Cards.id"] != card.id:
 				continue
 
-			set_song = next(set_song for set_song in playlist_set.set_songs)
+			set_song = next(set_song for set_song in playlist_set.set_songs if(set_song.id == card_song_dict["SongsSets.id"]))
 			position = card_song_dict["position"]
 			card.set_songs[position] = set_song
-
-
-@connect
-def select_cards_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
-	query = """SELECT * FROM "Cards" WHERE "Rounds.id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (round.id,))
-
-	round.cards = [Card.from_dict(set_songs=CardSetSongs(round.size), round=round, **card_dict) for card_dict in cursor]
-	select_cards_songs(round.cards, round.playlist_set)

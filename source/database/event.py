@@ -34,18 +34,7 @@ def select_event(cursor: psycopg2.extras.RealDictCursor, id: str) -> Event:
 	cursor.execute(query, (id,))
 	event_dict: dict = cursor.fetchone()
 
-	event: Event = Event.from_dict(event_dict)
-	return event
-
-
-@connect
-def select_event_and_rounds(cursor: psycopg2.extras.RealDictCursor, id: str) -> Event:
-	query = """SELECT * FROM "Events" WHERE "id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (id,))
-
-	event: Event = Event.from_dict(cursor.fetchone())
-	database.round.select_rounds_for_event(event)
-
+	event: Event = Event.from_dict(**event_dict)
 	return event
 
 
@@ -57,11 +46,11 @@ def select_event_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round)
 		WHERE "id" = (SELECT "Events.id" FROM "Rounds" WHERE "id" = %s);"""
 	cursor.execute(query, (round.id,))
 
-	round.event = Event.from_dict({"round": round, **cursor.fetchone()})
+	round.event = Event.from_dict(round=round, **cursor.fetchone())
 
 
 @connect
 def select_events(cursor: psycopg2.extras.RealDictCursor) -> list[Event]:
-	query = """SELECT * FROM "Events" WHERE "is_deleted" = FALSE;"""
+	query = """SELECT * FROM "Events" WHERE "is_deleted" = FALSE ORDER BY "date" DESC;"""
 	cursor.execute(query)
-	return [Event.from_dict(event_dict) for event_dict in cursor]
+	return [Event.from_dict(**event_dict) for event_dict in cursor]

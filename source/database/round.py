@@ -37,21 +37,7 @@ def select_round(cursor: psycopg2.extras.RealDictCursor, id: str) -> Round:
 	cursor.execute(query, (id,))
 	round_dict: dict = cursor.fetchone()
 
-	round: Round = Round.from_dict(round_dict)
-	return round
-
-
-@connect
-def select_round_all(cursor: psycopg2.extras.RealDictCursor, id: str) -> Round:
-	query = """SELECT * FROM "Rounds" WHERE "id" = %s AND "is_deleted" = FALSE;"""
-	cursor.execute(query, (id,))
-	round_dict: dict = cursor.fetchone()
-	round: Round = Round.from_dict(round_dict)
-
-	round.event = database.event.select_event(round_dict["Events.id"])
-	round.playlist_set = database.playlist_set.select_playlist_set(round_dict["PlaylistsSets.id"])
-	database.cards.select_cards_for_round(round)
-
+	round: Round = Round.from_dict(**round_dict)
 	return round
 
 
@@ -59,14 +45,14 @@ def select_round_all(cursor: psycopg2.extras.RealDictCursor, id: str) -> Round:
 def select_rounds(cursor: psycopg2.extras.RealDictCursor) -> list[Round]:
 	query = """SELECT * FROM "Rounds" WHERE "is_deleted" = FALSE;"""
 	cursor.execute(query)
-	return [Round.from_dict(round_dict) for round_dict in cursor]
+	return [Round.from_dict(**round_dict) for round_dict in cursor]
 
 
 @connect
 def select_rounds_for_event(cursor: psycopg2.extras.RealDictCursor, event: Event) -> None:
 	query = """SELECT * FROM "Rounds" WHERE "Events.id" = %s AND "is_deleted" = FALSE;"""
 	cursor.execute(query, (event.id,))
-	event.rounds = [Round.from_dict({**round_dict, "event": event}) for round_dict in cursor]
+	event.rounds = [Round.from_dict(event=event, **round_dict) for round_dict in cursor]
 
 
 @connect
@@ -74,8 +60,8 @@ def select_round_for_card(cursor: psycopg2.extras.RealDictCursor, card: Round) -
 	query = """
 		SELECT *
 		FROM "Rounds"
-		WHERE "id" = (SELECT "Rounds.id" FROM "Cards" WHERE "id" = %s);
+		WHERE "id" = (SELECT "Rounds.id" FROM "Cards" WHERE "id" = %s AND "is_deleted" = FALSE);
 	"""
 	cursor.execute(query, (card.id,))
 
-	card.round = Round.from_dict({"cards": [card], **cursor.fetchone()})
+	card.round = Round.from_dict(cards=[card], **cursor.fetchone())
