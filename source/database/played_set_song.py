@@ -5,7 +5,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 #                                                                                                                      #
 #   created by: MPZinke                                                                                                #
-#   on 2025.09.21                                                                                                      #
+#   on 2025.10.28                                                                                                      #
 #                                                                                                                      #
 #   DESCRIPTION:                                                                                                       #
 #   BUGS:                                                                                                              #
@@ -14,4 +14,28 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from database import card, event, played_set_song, playlist, playlist_set, round, set_song, song
+import psycopg2.extras
+
+
+from database.connect import connect
+from spotify.classes import Playlist, Song
+from trinkgo.classes import PlaylistSet, Round, SetSong
+
+
+@connect
+def insert_played_set_song(cursor: psycopg2.extras.RealDictCursor, set_song: SetSong, round: Round):
+	query = """INSERT INTO "PlayedSetSongs" ("SongsSets.id", "Rounds.id") VALUES (%s, %s) RETURNING "id";"""
+	cursor.execute(query, (set_song.id, round.id))
+	return cursor.fetchone()["id"]
+
+
+@connect
+def select_played_set_songs_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
+	query = """SELECT * FROM "PlayedSongsSets" WHERE "Rounds.id" = %s;"""
+	cursor.execute(query, (round.id,))
+
+	round.played_set_songs = []
+	for card_song_dict in cursor:
+		card_song_matches = lambda set_song: set_song.id == card_song_dict["SongsSets.id"]
+		set_song = next(filter(card_song_matches, round.playlist_set.set_songs))
+		round.played_set_songs.append(set_song)

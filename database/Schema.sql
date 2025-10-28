@@ -82,6 +82,18 @@ CREATE TABLE "Rounds"
 );
 
 
+DROP TABLE IF EXISTS "PlayedSongsSets" CASCADE;
+CREATE TABLE "PlayedSongsSets"
+(
+	"id" SERIAL NOT NULL PRIMARY KEY,
+	"Rounds.id" INT NOT NULL,
+	"SongsSets.id" INT NOT NULL,
+	FOREIGN KEY ("Rounds.id") REFERENCES "Rounds" ("id"),
+	FOREIGN KEY ("SongsSets.id") REFERENCES "SongsSets" ("id"),
+	UNIQUE ("Rounds.id", "SongsSets.id")
+);
+
+
 DROP TABLE IF EXISTS "Cards" CASCADE;
 CREATE TABLE "Cards"
 (

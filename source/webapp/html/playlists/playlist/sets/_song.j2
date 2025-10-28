@@ -1,0 +1,56 @@
+<tr>
+	<td>
+		{{ index }}
+	</td>
+	<td>
+		<img
+			src="{{ set_song.song.artwork }}"
+		>
+	</td>
+	<td>
+		<b>
+			{{ set_song.song.title }}
+		</b>
+		<br/>
+		{{ set_song.song.artists }}
+		<br/>
+		{{ set_song.song.released }}
+		&emsp;
+		{{ set_song.song.album }}
+	</td>
+	<td>
+		<button
+			id="play_{{ set_song.song.uri }}-button"
+			class="play-button"
+			onclick="get_start_and_play_song(this, `{{ set_song.song.uri }}`)"
+		>
+			Play
+		</button>
+		@
+		<input
+			id="song_start-{{ set_song.song.uri }}-input"
+			name="song_start-{{ set_song.song.uri }}-input"
+			type="number"
+			value={{ set_song.start }}
+			max="{{ set_song.duration-1 }}"
+		/>
+		ms
+		for
+		<input
+			id="song_duration-{{ set_song.song.uri }}-input"
+			name="song_duration-{{ set_song.song.uri }}-input"
+			type="number"
+			value="{{ set_song.duration }}"
+			min="1"
+			max="{{ set_song.duration }}"
+		/>
+		ms
+	</td>
+	<td>
+		<button
+			onclick="save(`{{ set_song.id }}`, `{{ set_song.song.uri }}`)"
+		>
+			Save
+		</button>
+	</td>
+</tr>

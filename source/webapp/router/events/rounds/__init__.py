@@ -25,9 +25,11 @@ import requests
 import database
 import spotify
 from trinkgo.classes import Event, PlaylistSet, Round
+from trinkgo.create_card import create_cards
 from webapp.router import app
 from webapp.router.auth import authorize
 from webapp.router.events.rounds.cards import cards_blueprint
+from webapp.router.events.rounds.play import play_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[3]
@@ -37,12 +39,14 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 rounds_blueprint = Blueprint('rounds_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
 rounds_blueprint.register_blueprint(cards_blueprint)
+rounds_blueprint.register_blueprint(play_blueprint)
 
 
 @rounds_blueprint.get("/events/<int:id>/rounds")
 def GET_events_event_rounds(id: int):
 	event: Event = database.event.select_event(id)
 	database.round.select_rounds_for_event(event)
+	database.playlist_set.select_playlist_sets_for_rounds(event.rounds)
 
 	return render_template("events/event/rounds/index.j2", event=event)
 
@@ -71,12 +75,14 @@ def POST_events_event_rounds_new(id: int):
 		size=size,
 		start=None,
 		ended=False,
+		cards=[],
 		event=Event(id=id,name=None,date=None,start=None,ended=None,rounds=None),
+		played_set_songs=None,
 		playlist_set=PlaylistSet(id=playlist_set_id, name=None, playlist=None, set_songs=None),
-		cards=None,
 	)
 
 	database.round.insert_round(round)
+	create_cards(round, number_of_cards)
 
 	return redirect(f"/events/{id}/rounds/{round.id}")
 

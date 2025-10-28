@@ -56,6 +56,17 @@ def select_rounds_for_event(cursor: psycopg2.extras.RealDictCursor, event: Event
 
 
 @connect
+def select_rounds_for_events(cursor: psycopg2.extras.RealDictCursor, events: list[Event]) -> None:
+	query = """SELECT * FROM "Rounds" WHERE "is_deleted" = FALSE;"""
+	cursor.execute(query)
+	round_dicts = list(map(dict, cursor))
+
+	for event in events:
+		event_round_dicts = list(filter(lambda round_dict: round_dict["Events.id"] == event.id, round_dicts))
+		event.rounds = list(map(lambda round_dict: Round.from_dict(event=event, **round_dict), event_round_dicts))
+
+
+@connect
 def select_round_for_card(cursor: psycopg2.extras.RealDictCursor, card: Round) -> None:
 	query = """
 		SELECT *

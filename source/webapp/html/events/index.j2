@@ -37,9 +37,9 @@
 					</td>
 					<td>
 						<a
-							href="/events/{{ event.id }}/rounds/new"
+							href="/events/{{ event.id }}/rounds"
 						>
-							+ New Round
+							{{ event.rounds | length }} Rounds
 						</a>
 					</td>
 				</tr>

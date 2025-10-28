@@ -1,0 +1,31 @@
+<tr
+	id="unplayed_song_{{ set_song.id }}-tr"
+>
+	<td>
+		{{ index }}
+	</td>
+	<td>
+		<img
+			src="{{ set_song.song.artwork }}"
+		>
+	</td>
+	<td>
+		<b>
+			{{ set_song.song.title }}
+		</b>
+		<br/>
+		{{ set_song.song.artists }}
+		<br/>
+		{{ set_song.song.released }}
+		&emsp;
+		{{ set_song.song.album }}
+	</td>
+	<td>
+		<button
+			id="play_{{ set_song.song.uri }}-button"
+			onclick="play_song_next(`{{ set_song.id }}`)"
+		>
+			Play Next
+		</button>
+	</td>
+</tr>

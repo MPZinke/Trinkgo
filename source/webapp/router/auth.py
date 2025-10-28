@@ -35,10 +35,14 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 auth_blueprint = Blueprint('auth_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
 
 
+REDIRECT = None
+
+
 def authorize(function: callable) -> callable:
 	def wrapper(*args: list, **kwargs: dict):
 		if(not app.tokens.authenticated):
-			return redirect("/login")
+			param_string = urllib.parse.urlencode({"post_login_redirect": request.full_path})
+			return redirect(f"/login?{param_string}")
 
 		return function(*args, **kwargs)
 
@@ -52,12 +56,16 @@ def authorize(function: callable) -> callable:
 def login():
 	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
 	#    @: Request User Authorization
+	global REDIRECT
+
+	REDIRECT = request.args.get("post_login_redirect")
+
 	params = {
 		"response_type": "code",
 		"client_id": "8dc7f8b757934d9ebaf39f9347bccc56",
 		"scope": "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
 		"state": "",
-		"redirect_uri": "http://127.0.0.1:8080/authenticated",
+		"redirect_uri": f"http://127.0.0.1:8080/authenticated",
 	}
 	param_string = urllib.parse.urlencode(params)
 
@@ -66,10 +74,17 @@ def login():
 
 @auth_blueprint.route("/authenticated")
 def authenticated():
+	global REDIRECT
+
 	code = request.args.get("code")
 	if(code is None):
 		raise Exception("URL parameter `code` is missing.")
 
 	app.tokens.code = code
+
+	if(REDIRECT is not None):
+		post_login_redirect = REDIRECT
+		REDIRECT = None
+		return redirect(post_login_redirect)
 
 	return redirect("/home")

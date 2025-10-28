@@ -1,0 +1,30 @@
+<tr>
+	<td>
+		{{ index }}
+	</td>
+	<td>
+		<img
+			src="{{ song.artwork }}"
+		>
+	</td>
+	<td>
+		<b>
+			{{ song.title }}
+		</b>
+		<br/>
+		{{ song.artists }}
+		<br/>
+		{{ song.released }}
+		&emsp;
+		{{ song.album }}
+	</td>
+	<td>
+		<button
+			id="play_{{ song.uri }}-button"
+			class="play-button"
+			onclick="get_start_and_play_song(this, `{{ song.uri }}`)"
+		>
+			Play
+		</button>
+	</td>
+</tr>

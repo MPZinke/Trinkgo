@@ -30,34 +30,67 @@
 			{{ event.name }}'s Rounds
 		</h1>
 
+		<a
+			href="/events/{{ event.id }}/rounds/new"
+		>
+			+ New Round
+		</a>
+
 		<h2>
-			<a
-				href="/events/{{ event.id }}/rounds"
-			>
-				Rounds
-			</a>
+			Rounds
 		</h2>
+
 		<table>
-			<tr>
-				<td>
-					<a
-						href="/events/{{ event.id }}/rounds/new"
-					>
-						+ New Round
-					</a>
-				</td>
-			</tr>
-			{% for event_round in event.rounds %}
+			<thead>
 				<tr>
-					<td>
-						<a
-							href="/events/{{ event.id }}/rounds/{{ event_round.id }}"
-						>
-							{{ event_round.name }}
-						</a>
-					</td>
+					<th>
+						Round
+					</th>
+					<th>
+						Playlist Set
+					</th>
+					<th>
+					</th>
 				</tr>
-			{% endfor %}
+			</thead>
+
+			<tbody>
+				{% for round in event.rounds %}
+					<tr>
+						<td>
+							<a
+								href="/events/{{ event.id }}/rounds/{{ round.id }}"
+							>
+								{{ round.name }}
+							</a>
+						</td>
+						<td>
+							<a
+								href="/playlists/{{ round.playlist_set.playlist.id }}/sets/{{ round.playlist_set.id }}"
+							>
+								{{ round.playlist_set.name }}
+							</a>
+						</td>
+						<td>
+							{% if round.ended is false %}
+								<a
+									href="/events/{{ round.event.id }}/rounds/{{ round.id }}/play"
+								>
+									<button>
+										{% if round.start is none %}
+											Start
+										{% else %}
+											Continue
+										{% endif %}
+									</button>
+								</a>
+							{% else %}
+								Finished
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
 		</table>
 	</body>
 </html>

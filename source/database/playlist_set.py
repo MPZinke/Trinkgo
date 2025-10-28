@@ -88,6 +88,34 @@ def select_playlist_set_for_round(cursor: psycopg2.extras.RealDictCursor, round:
 
 
 @connect
+def select_playlist_sets_for_rounds(cursor: psycopg2.extras.RealDictCursor, rounds: list[Round]) -> Playlist:
+	query = """
+		SELECT
+			"Rounds"."id" AS "Rounds.id",
+			"PlaylistsSets".*,
+			"Playlists"."title" AS "Playlists.title",
+			"Playlists"."uri" AS "Playlists.uri"
+		FROM "Rounds"
+		JOIN "PlaylistsSets" ON "Rounds"."PlaylistsSets.id" = "PlaylistsSets"."id"
+		JOIN "Playlists" ON "PlaylistsSets"."Playlists.id" = "Playlists"."id"
+		WHERE "Rounds"."id" IN %s;
+	"""
+	rounds_ids = (0, *[round.id for round in rounds])  # Mitigate empty cards SQL syntax issue
+	cursor.execute(query, (rounds_ids,))
+
+
+	for playlist_set_dict in cursor:
+		round = next(filter(lambda round: playlist_set_dict["Rounds.id"] == round.id, rounds))
+		playlist = Playlist(
+			id=playlist_set_dict["Playlists.id"],
+			title=playlist_set_dict["Playlists.title"],
+			uri=playlist_set_dict["Playlists.uri"],
+			songs=None,
+		)
+		round.playlist_set = PlaylistSet.from_dict(playlist=playlist, **playlist_set_dict)
+
+
+@connect
 def select_playlist_sets(cursor: psycopg2.extras.RealDictCursor) -> list[Playlist]:
 	query = """SELECT * FROM "PlaylistsSets" WHERE "is_deleted" = FALSE;"""
 	cursor.execute(query)

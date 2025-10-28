@@ -21,6 +21,7 @@ from typing import Optional, TypeVar
 Card = TypeVar("Card")
 Event = TypeVar("Event")
 PlaylistSet = TypeVar("PlaylistSet")
+SetSong = TypeVar("SetSong")
 
 
 class Round:
@@ -31,18 +32,20 @@ class Round:
 		size: list[int],
 		start: Optional[datetime],
 		ended: bool,
-		event: Optional[Event],
-		playlist_set: Optional[PlaylistSet],
 		cards: Optional[list[Card]],
+		event: Optional[Event],
+		played_set_songs: Optional[list[SetSong]],
+		playlist_set: Optional[PlaylistSet],
 	):
 		self.id: int = id
 		self.name: str = name
 		self.size: list[int] = size
 		self.start: datetime = start
 		self.ended: bool = ended
-		self.event: Optional[Event] = event
-		self.playlist_set: Optional[PlaylistSet] = playlist_set
 		self.cards: Optional[list[Card]] = cards
+		self.event: Optional[Event] = event
+		self.played_set_songs: Optional[list[SetSong]] = played_set_songs
+		self.playlist_set: Optional[PlaylistSet] = playlist_set
 
 
 	@staticmethod
@@ -53,7 +56,8 @@ class Round:
 			size=round_dict["size"],
 			start=round_dict["start"],
 			ended=round_dict["ended"],
-			event=round_dict.get("event"),
-			playlist_set=round_dict.get("playlist_set"),
 			cards=round_dict.get("cards"),
+			event=round_dict.get("event"),
+			played_set_songs=round_dict.get("played_set_songs"),
+			playlist_set=round_dict.get("playlist_set"),
 		)

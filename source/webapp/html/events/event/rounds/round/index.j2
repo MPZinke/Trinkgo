@@ -62,7 +62,21 @@
 					Started
 				</td>
 				<td>
-					{{ round.start }}
+					{% if round.ended is false %}
+						<a
+							href="/events/{{ round.event.id }}/rounds/{{ round.id }}/play"
+						>
+							<button>
+								{% if round.start is none %}
+									Start
+								{% else %}
+									Continue
+								{% endif %}
+							</button>
+						</a>
+					{% else %}
+						{{ round.start }}
+					{% endif %}
 				</td>
 			</tr>
 			<tr>

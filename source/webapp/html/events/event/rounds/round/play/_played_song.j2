@@ -1,0 +1,30 @@
+<tr>
+	<td>
+		{{ index }}
+	</td>
+	<td>
+		<img
+			src="{{ set_song.song.artwork }}"
+		>
+	</td>
+	<td>
+		<b>
+			{{ set_song.song.title }}
+		</b>
+		<br/>
+		{{ set_song.song.artists }}
+		<br/>
+		{{ set_song.song.released }}
+		&emsp;
+		{{ set_song.song.album }}
+	</td>
+	<td>
+		<button
+			id="play_{{ set_song.song.uri }}-button"
+			class="play-button"
+			onclick="play_next(this, `{{ set_song.song.uri }}`)"
+		>
+			Play Again
+		</button>
+	</td>
+</tr>

@@ -1,5 +1,3 @@
-{% from "playlists/playlist/sets/song.j2" import render_set_song %}
-
 <!DOCTYPE html>
 <html>
 	<title>
@@ -46,8 +44,9 @@
 		</a>
 
 		<table>
-			{% for song in playlist_set.set_songs %}
-				{{ render_set_song(loop.index, song) }}
+			{% for set_song in playlist_set.set_songs %}
+				{% set index=loop.index %}
+				{% include "playlists/playlist/sets/_song.j2" with context %}
 			{% endfor %}
 		</table>
 
