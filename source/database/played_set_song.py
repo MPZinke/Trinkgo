@@ -24,9 +24,12 @@ from trinkgo.classes import PlaylistSet, Round, SetSong
 
 @connect
 def insert_played_set_song(cursor: psycopg2.extras.RealDictCursor, set_song: SetSong, round: Round):
-	query = """INSERT INTO "PlayedSetSongs" ("SongsSets.id", "Rounds.id") VALUES (%s, %s) RETURNING "id";"""
+	query = """INSERT INTO "PlayedSongsSets" ("SongsSets.id", "Rounds.id") VALUES (%s, %s) RETURNING "id";"""
 	cursor.execute(query, (set_song.id, round.id))
-	return cursor.fetchone()["id"]
+	if(round.played_set_songs is None):
+		round.played_set_songs = []
+
+	round.played_set_songs.append(set_song)
 
 
 @connect

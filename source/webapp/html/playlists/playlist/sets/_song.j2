@@ -22,7 +22,7 @@
 		<button
 			id="play_{{ set_song.song.uri }}-button"
 			class="play-button"
-			onclick="get_start_and_play_song(this, `{{ set_song.song.uri }}`)"
+			onclick="get_start_and_play_song(this, `{{ set_song.song.uri }}`).then(() => {})"
 		>
 			Play
 		</button>

@@ -82,46 +82,25 @@
 		}
 
 
-		pause()
+		async pause()
 		{
-			this.player.pause();
+			await this.player.pause();
 			this.clear_timer();
 		}
 
 
-		play(callback, timer=null)
+		async play_song(uri, start=null, timer=null)
 		{
 			if(this.playing !== null)
 			{
-				this.player.pause();
-				this.clear_timer();
-			}
-
-			try
-			{
-				callback(player_id)
-			}
-			catch(error)
-			{
-				console.log(error);
-				alert(error);
-				return;
-			}
-		}
-
-
-		play_song(uri, start=null, timer=null)
-		{
-			if(this.playing !== null)
-			{
-				this.player.pause();
+				await this.player.pause();
 				this.clear_timer();
 			}
 
 			this.timer = timer;
 
 			let request = new Request(
-				`/api/play/song`,
+				`/api/play_song`,
 				{
 					method: `POST`,
 					headers: {"Content-Type": "application/json"},
@@ -129,14 +108,19 @@
 				}
 			)
 
-			fetch(request)
-			.catch(
-				(error) =>
+			try
+			{
+				let response = await fetch(request);
+				if(response.status != 204)
 				{
-					console.error(error);
-					alert(error);
+					return alert(`${response.status}`+response.body);
 				}
-			)
+			}
+			catch(error)
+			{
+				console.error(error);
+				alert(error);
+			}
 		}
 	}
 

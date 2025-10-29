@@ -23,7 +23,7 @@
 	<td>
 		<button
 			id="play_{{ set_song.song.uri }}-button"
-			onclick="play_song_next(`{{ set_song.id }}`)"
+			onclick="play_next(`{{ set_song.id }}`, {{ set_song.duration }})"
 		>
 			Play Next
 		</button>

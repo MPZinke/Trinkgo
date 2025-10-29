@@ -73,7 +73,7 @@
 {% include("player.j2") %}
 
 <script>
-	function get_start_and_play_song(button, uri)
+	async function get_start_and_play_song(button, uri)
 	{
 		var play_buttons = document.getElementsByClassName("play-button");
 		for(var x = 0; x < play_buttons.length; x++)
@@ -85,7 +85,7 @@
 		}
 
 		button.innerHTML = "Pause";
-		button.onclick = () => update_button_and_pause(button, uri);
+		button.onclick = async () => update_button_and_pause(button, uri);
 
 
 		let start = document.getElementById(`song_start-${uri}-input`).value;
@@ -96,34 +96,47 @@
 		};
 		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${uri}-input`).value, action);
 
-		PLAYER.play_song(uri, start, timer);
+		await PLAYER.play_song(uri, start, timer);
 	}
 
 
-	function update_button_and_pause(button, uri)
+	async function update_button_and_pause(button, uri)
 	{
-		button.onclick = () => get_start_and_play_song(button, uri);
+		button.onclick = async () => get_start_and_play_song(button, uri);
 		button.innerHTML = "Play";
 
-		PLAYER.pause();
+		await PLAYER.pause();
 	}
 
 
-	function save(id, uri)
+	async function save(id, uri)
 	{
 		let playlist_id = window.location.pathname.split("/")[2];
 
 		let start = document.getElementById(`song_start-${uri}-input`).value;
 		let duration = document.getElementById(`song_duration-${uri}-input`).value;
 
-		let xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("POST", `/api/set_song/save`, false);
-		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify({playlist_id, set_song_id: id, start, duration}));
+		let request = new Request(
+			`/api/set_song/save`,
+			{
+				method: `POST`,
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({playlist_id, set_song_id: id, start, duration})
+			}
+		)
 
-		if(xmlhttp.status != 204)
+		try
 		{
-			return alert(`${xmlhttp.status}`+xmlhttp.responseText);
+			let response = await fetch(request);
+			if(response.status != 204)
+			{
+				return alert(`${response.status}`+response.body);
+			}
+		}
+		catch(error)
+		{
+			console.error(error);
+			alert(error);
 		}
 	}
 </script>

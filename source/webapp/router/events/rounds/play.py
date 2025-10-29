@@ -48,4 +48,6 @@ def GET_events_event_rounds_round_play(event_id: int, round_id: int):
 	database.card.select_cards_for_round(round)
 	database.played_set_song.select_played_set_songs_for_round(round)
 
+	print(round.played_set_songs)
+
 	return render_template("events/event/rounds/round/play/index.j2", round=round)

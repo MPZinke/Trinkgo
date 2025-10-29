@@ -66,7 +66,7 @@
 {% include("player.j2") %}
 
 <script>
-	function get_start_and_play_song(button, uri)
+	async function get_start_and_play_song(button, uri)
 	{
 		var play_buttons = document.getElementsByClassName("play-button");
 		for(var x = 0; x < play_buttons.length; x++)
@@ -74,27 +74,21 @@
 			let play_button = play_buttons[x];;
 			play_button.innerHTML = "Play";
 			let button_id = play_button.id.match(/play_([a-zA-Z0-9]{22})-button/)[1];
-			play_button.onclick = () => get_start_and_play_song(play_button, button_id);
+			play_button.onclick = async () => get_start_and_play_song(play_button, button_id);
 		}
 
 		button.innerHTML = "Pause";
-		button.onclick = () => update_button_and_pause(button, uri);
+		button.onclick = async () => update_button_and_pause(button, uri);
 
-		let action = function()
-		{
-			button.onclick = () => get_start_and_play_song(button, uri);
-			button.innerHTML = "Play";
-		};
-
-		PLAYER.play_song(uri);
+		await PLAYER.play_song(uri);
 	}
 
 
-	function update_button_and_pause(button, id)
+	async function update_button_and_pause(button, id)
 	{
-		button.onclick = () => get_start_and_play_song(button, id);
+		button.onclick = async () => get_start_and_play_song(button, id);
 		button.innerHTML = "Play";
 
-		PLAYER.pause();
+		await PLAYER.pause();
 	}
 </script>
