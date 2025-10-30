@@ -44,17 +44,17 @@ rounds_blueprint.register_blueprint(play_blueprint)
 
 @rounds_blueprint.get("/events/<int:id>/rounds")
 def GET_events_event_rounds(id: int):
-	event: Event = database.event.select_event(id)
-	database.round.select_rounds_for_event(event)
-	database.playlist_set.select_playlist_sets_for_rounds(event.rounds)
+	event: Event = database.events.select_event(id)
+	database.rounds.select_rounds_for_event(event)
+	database.playlist_sets.select_playlist_sets_for_rounds(event.rounds)
 
 	return render_template("events/event/rounds/index.j2", event=event)
 
 
 @rounds_blueprint.get("/events/<int:id>/rounds/new")
 def GET_events_event_rounds_new(id: int):
-	event: Event = database.event.select_event(id)
-	playlist_sets: list[PlaylistSet] = database.playlist_set.select_playlist_sets()
+	event: Event = database.events.select_event(id)
+	playlist_sets: list[PlaylistSet] = database.playlist_sets.select_playlist_sets()
 
 	return render_template("events/event/rounds/new.j2", event=event, playlist_sets=playlist_sets)
 
@@ -81,7 +81,7 @@ def POST_events_event_rounds_new(id: int):
 		playlist_set=PlaylistSet(id=playlist_set_id, name=None, playlist=None, set_songs=None),
 	)
 
-	database.round.insert_round(round)
+	database.rounds.insert_round(round)
 	create_cards(round, number_of_cards)
 
 	return redirect(f"/events/{id}/rounds/{round.id}")
@@ -89,9 +89,9 @@ def POST_events_event_rounds_new(id: int):
 
 @rounds_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>")
 def GET_events_event_rounds_round(event_id: int, round_id: int):
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.card.select_cards_for_round(round)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.cards.select_cards_for_round(round)
 
 	return render_template("events/event/rounds/round/index.j2", round=round)

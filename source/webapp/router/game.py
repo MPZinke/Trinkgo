@@ -27,13 +27,13 @@ play_blueprint = Blueprint('play_blueprint', __name__, template_folder=HTML_DIRE
 @play_blueprint.get("/play")
 @play_blueprint.get("/play/")
 def GET_play():
-	play = database.playlist.select_play()
+	play = database.playlists.select_play()
 	return render_template("play/index.j2", play=play)
 
 
 @play_blueprint.get("/play/new")
 @play_blueprint.get("/play/new/")
 def GET_play():
-	play = database.playlist.select_play()
+	play = database.playlists.select_play()
 	return render_template("play/index.j2", play=play)
 

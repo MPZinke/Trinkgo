@@ -42,8 +42,8 @@ events_blueprint.register_blueprint(rounds_blueprint)
 @events_blueprint.get("/events")
 @events_blueprint.get("/events/")
 def GET_events():
-	events = database.event.select_events()
-	database.round.select_rounds_for_events(events)
+	events = database.events.select_events()
+	database.rounds.select_rounds_for_events(events)
 	return render_template("events/index.j2", events=events)
 
 
@@ -66,15 +66,15 @@ def POST_events_new():
 		rounds=None,
 	)
 
-	database.event.insert_event(event)
+	database.events.insert_event(event)
 
 	return redirect(f"/events/{event.id}")
 
 
 @events_blueprint.get("/events/<int:id>")
 def GET_events_event(id: int):
-	event: Event = database.event.select_event(id)
-	database.round.select_rounds_for_event(event)
-	database.playlist_set.select_playlist_sets_for_rounds(event.rounds)
+	event: Event = database.events.select_event(id)
+	database.rounds.select_rounds_for_event(event)
+	database.playlist_sets.select_playlist_sets_for_rounds(event.rounds)
 
 	return render_template("events/event/index.j2", event=event)

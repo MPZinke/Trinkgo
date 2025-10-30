@@ -41,12 +41,12 @@ play_blueprint = Blueprint('play_blueprint', __name__, template_folder=HTML_DIRE
 @play_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/play")
 @authorize
 def GET_events_event_rounds_round_play(event_id: int, round_id: int):
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.set_song.select_set_songs_for_playlist_set(round.playlist_set)
-	database.card.select_cards_for_round(round)
-	database.played_set_song.select_played_set_songs_for_round(round)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.cards.select_cards_for_round(round)
+	database.played_set_songs.select_played_set_songs_for_round(round)
 
 	print(round.played_set_songs)
 

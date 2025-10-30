@@ -62,6 +62,6 @@ def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat
 
 		cards.append(card)
 
-	database.card.insert_cards(cards)
+	database.cards.insert_cards(cards)
 
 	return cards

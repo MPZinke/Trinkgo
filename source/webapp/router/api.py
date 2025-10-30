@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from time import sleep  # TESTING
+import random
 from typing import Optional
 
 
@@ -49,7 +49,7 @@ def api_song_play():
 	player_id: str = request_json.get("player_id")
 	id: str = request_json.get("id")
 
-	song: Song = database.song.select_song(id)
+	song: Song = database.songs.select_song(id)
 
 	spotify.requests.player.play_song(app.tokens, player_id, song)
 	return ("", 204)
@@ -61,10 +61,10 @@ def api_set_song_play():
 	request_json = request.json
 	player_id: str = request_json.get("player_id")
 	id: str = request_json.get("id")
-	start: str = request_json.get("start")
+	start: Optional[str] = request_json.get("start")
 
-	set_song: SetSong = database.set_song.select_set_song(id)
-	if(isinstance(start, str) and start.isnumeric()):
+	set_song: SetSong = database.set_songs.select_set_song(id)
+	if(start is not None):
 		set_song.start = int(start)
 
 	spotify.requests.player.play_song(app.tokens, player_id, set_song.song, set_song.start)
@@ -87,7 +87,7 @@ def api_song_save():
 		playlist_set=None,
 	)
 
-	database.set_song.update_song_start_and_duration(set_song)
+	database.set_songs.update_song_start_and_duration(set_song)
 
 	return ("", 204)
 
@@ -97,18 +97,24 @@ def api_song_save():
 def api_rounds_round_play_next(round_id: int):
 	request_json = request.json
 	player_id: str = request_json.get("player_id")
-	set_song_id: int = int(request_json.get("set_song_id"))
+	set_song_id: Optional[str]|int = request_json.get("set_song_id")
 
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.set_song.select_set_songs_for_playlist_set(round.playlist_set)
-	database.played_set_song.select_played_set_songs_for_round(round)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.played_set_songs.select_played_set_songs_for_round(round)
 
-	set_song = next(filter(lambda set_song: set_song.id == set_song_id, round.playlist_set.set_songs))
-	database.played_set_song.insert_played_set_song(set_song, round)
+	if(set_song_id is not None):
+		set_song = next(filter(lambda set_song: set_song.id == set_song_id, round.playlist_set.set_songs))
+	else:
+		unplayed_set_songs = list(filter(lambda set_song: set_song not in round.played_set_songs, round.playlist_set.set_songs))
+		set_song: SetSong = random.choice(unplayed_set_songs)
+
+	database.played_set_songs.insert_played_set_song(set_song, round)
 
 	return {
+		"set_song_id": set_song.id,
 		"duration": set_song.duration,
 		"html": render_template(
 			"events/event/rounds/round/play/_played_song.j2",

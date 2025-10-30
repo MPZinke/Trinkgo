@@ -90,6 +90,13 @@
 			</tr>
 		</table>
 
+		<button
+			id="play_next_random-button"
+			onclick="play_next()"
+		>
+			Play Random
+		</button>
+
 		<table>
 			<tr>
 				{# TODO: make scrollable #}
@@ -141,32 +148,13 @@
 {% include("player.j2") %}
 
 <script>
+	const PLAY_NEXT_RANDOM = document.getElementById("play_next_random-button");
 	const PLAYED_SONGS_TABLE = document.getElementById("played_songs-tbody");
 
 
-	function play_random()
+	async function play_next(set_song_id=null)
 	{
-
-	}
-
-
-	async function play_next(button, set_song_id, duration)
-	{
-		button.disabled = true;
-
-		let on_play = () =>
-		{
-			let play_button = document.getElementById(`played_set_song_${set_song_id}-button`);
-			play_button.innerHTML = "Pause";
-			play_button.onclick = async () => await PLAYER.pause();
-		}
-
-		let on_pause = () =>
-		{
-			let play_button = document.getElementById(`played_set_song_${set_song_id}-button`);
-			play_button.innerHTML = "Play Again";
-			play_button.onclick = async () => play_again(play_button, set_song_id, start, duration);
-		}
+		PLAY_NEXT_RANDOM.disabled = true;
 
 		try
 		{
@@ -189,15 +177,37 @@
 			created_element.innerHTML = response_json.html;
 			PLAYED_SONGS_TABLE.prepend(created_element.firstChild);
 
-			document.getElementById(`unplayed_song_${set_song_id}-tr`).remove();
+			document.getElementById(`unplayed_song_${response_json.set_song_id}-tr`).remove();
 
-			await PLAYER.play_song(set_song_id, on_play, on_pause, null, response_json.duration);
+			let on_play = () =>
+			{
+				let play_button = document.getElementById(`played_set_song_${response_json.set_song_id}-button`);
+				play_button.innerHTML = "Pause";
+				play_button.onclick = async () => await PLAYER.pause();
+			}
+			let on_pause = () =>
+			{
+				let play_button = document.getElementById(`played_set_song_${response_json.set_song_id}-button`);
+				play_button.innerHTML = "Play Again";
+				play_button.onclick = async () =>
+				{
+					await play_again(
+						play_button,
+						response_json.set_song_id,
+						null,
+						response_json.duration
+					);
+				};
+			}
+			await PLAYER.play_song(response_json.set_song_id, on_play, on_pause, null, response_json.duration);
 		}
 		catch(error)
 		{
 			console.error(error);
 			alert(error);
 		}
+
+		PLAY_NEXT_RANDOM.disabled = false;
 	}
 
 
@@ -215,7 +225,7 @@
 		let on_pause = () =>
 		{
 			button.innerHTML = "Play Again";
-			button.onclick = async () => play_again(button, set_song_id, start, duration);
+			button.onclick = async () => await play_again(button, set_song_id, start, duration);
 		}
 
 		try

@@ -41,10 +41,10 @@ cards_blueprint = Blueprint('cards_blueprint', __name__, template_folder=HTML_DI
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards")
 def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.card.select_cards_for_round(round)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.cards.select_cards_for_round(round)
 
 	return render_template("events/event/rounds/round/cards.j2", round=round)
 
@@ -53,12 +53,12 @@ def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
 def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
 	number_of_cards: int = int(request.form.get("number_of_cards-input"))
 
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.set_song.select_set_songs_for_playlist_set(round.playlist_set)
-	database.card.select_cards_for_round(round)
-	database.card.select_cards_songs(round.cards, round.playlist_set)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.cards.select_cards_for_round(round)
+	database.cards.select_cards_songs(round.cards, round.playlist_set)
 
 	create_cards(round, number_of_cards)
 
@@ -67,12 +67,12 @@ def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/all")
 def GET_events_event_rounds_round_cards_all(event_id: int, round_id: int):
-	round: Round = database.round.select_round(round_id)
-	database.event.select_event_for_round(round)
-	database.playlist_set.select_playlist_set_for_round(round)
-	database.set_song.select_set_songs_for_playlist_set(round.playlist_set)
-	database.card.select_cards_for_round(round)
-	database.card.select_cards_songs(round.cards, round.playlist_set)
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.cards.select_cards_for_round(round)
+	database.cards.select_cards_songs(round.cards, round.playlist_set)
 
 	card_images = [card.image() for card in round.cards]
 	pdf = Card.pdf(card_images)
@@ -81,12 +81,12 @@ def GET_events_event_rounds_round_cards_all(event_id: int, round_id: int):
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/<int:card_id>")
 def GET_events_event_rounds_round_cards_card(event_id: int, round_id: int, card_id: int):
-	card: Card = database.card.select_card(card_id)
-	database.round.select_round_for_card(card)
-	database.event.select_event_for_round(card.round)
-	database.playlist_set.select_playlist_set_for_round(card.round)
-	database.set_song.select_set_songs_for_playlist_set(card.round.playlist_set)
-	database.card.select_card_songs(card, card.round.playlist_set)
+	card: Card = database.cards.select_card(card_id)
+	database.rounds.select_round_for_card(card)
+	database.events.select_event_for_round(card.round)
+	database.playlist_sets.select_playlist_set_for_round(card.round)
+	database.set_songs.select_set_songs_for_playlist_set(card.round.playlist_set)
+	database.cards.select_card_songs(card, card.round.playlist_set)
 
 	pdf: BytesIO = Card.pdf(card.image())
 	return send_file(pdf, download_name=f"{card.identifier}.pdf", mimetype="application/pdf")
