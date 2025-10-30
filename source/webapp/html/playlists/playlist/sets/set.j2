@@ -73,7 +73,7 @@
 {% include("player.j2") %}
 
 <script>
-	async function get_start_and_play_song(button, id)
+	async function get_start_and_play_song(button, set_song_id)
 	{
 		button.disabled = true;
 
@@ -87,14 +87,14 @@
 		let on_pause = () =>
 		{
 			button.innerHTML = "Play";
-			button.onclick = async () => get_start_and_play_song(button, id);
+			button.onclick = async () => get_start_and_play_song(button, set_song_id);
 		}
 
-		let start = document.getElementById(`song_start-${id}-input`).value;
-		let duration = document.getElementById(`song_duration-${id}-input`).value;
+		let start = document.getElementById(`set_song_start-${set_song_id}-input`).value;
+		let duration = document.getElementById(`set_song_duration-${set_song_id}-input`).value;
 		try
 		{
-			await PLAYER.play_set_song(id, on_play, on_pause, start, duration);
+			await PLAYER.play_set_song(set_song_id, on_play, on_pause, start, duration);
 		}
 		catch(error)
 		{
@@ -103,21 +103,22 @@
 	}
 
 
-	async function update_set_song_start_and_duration(id, id)
+	async function update_set_song(set_song_id)
 	{
 		let playlist_id = window.location.pathname.split("/")[2];
 
-		let start = document.getElementById(`song_start-${id}-input`).value;
-		let duration = document.getElementById(`song_duration-${id}-input`).value;
+		let label = document.getElementById(`set_song_label-${set_song_id}-input`).value;
+		let start = document.getElementById(`set_song_start-${set_song_id}-input`).value;
+		let duration = document.getElementById(`set_song_duration-${set_song_id}-input`).value;
 
 		try
 		{
 			let response = await fetch(
-				`/api/set_song/update_start_and_duration`,
+				`/api/set_songs/${set_song_id}/update`,
 				{
 					method: `POST`,
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({playlist_id, set_song_id: id, start, duration})
+					body: JSON.stringify({playlist_id, label, start, duration})
 				}
 			);
 			if(response.status != 204)
@@ -129,6 +130,34 @@
 		{
 			console.error(error);
 			alert(error);
+		}
+	}
+
+
+	function update_duration(set_song_id, song_length)
+	{
+		const start_input = document.getElementById(`set_song_start-${set_song_id}-input`);
+		const duration_input = document.getElementById(`set_song_duration-${set_song_id}-input`);
+
+		if(parseInt(start_input.value) < 0)
+		{
+			parseInt(start_input.value) = 0;
+		}
+		if(song_length < parseInt(start_input.value))
+		{
+			parseInt(start_input.value) = song_length;
+		}
+
+		if(parseInt(start_input.value) + parseInt(duration_input.value) > song_length)
+		{
+			console.log(parseInt(start_input.value));
+			console.log(typeof parseInt(start_input.value));
+			console.log(parseInt(duration_input.value));
+			console.log(typeof parseInt(duration_input.value));
+			console.log(parseInt(start_input.value) + parseInt(duration_input.value));
+			console.log(song_length);
+			console.log(typeof song_length);
+			parseInt(duration_input.value) = song_length - parseInt(start_input.value);
 		}
 	}
 </script>

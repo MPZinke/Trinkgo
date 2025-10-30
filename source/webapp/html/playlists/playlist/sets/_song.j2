@@ -19,35 +19,43 @@
 		{{ set_song.song.album }}
 	</td>
 	<td>
+		Label
+		<input
+			id="set_song_label-{{ set_song.id }}-input"
+			value="{{ set_song.label }}"
+		/>
+
+		<br/>
+
 		<button
-			id="play_{{ set_song.id }}-button"
+			id="play-{{ set_song.id }}-button"
 			onclick="get_start_and_play_song(this, `{{ set_song.id }}`)"
 		>
 			Play
 		</button>
 		@
 		<input
-			id="song_start-{{ set_song.id }}-input"
-			name="song_start-{{ set_song.id }}-input"
+			id="set_song_start-{{ set_song.id }}-input"
 			type="number"
 			value={{ set_song.start }}
 			max="{{ set_song.duration-1 }}"
+			onchange="update_duration({{ set_song.id }}, {{ set_song.song.length }})"
 		/>
 		ms
 		for
 		<input
-			id="song_duration-{{ set_song.id }}-input"
-			name="song_duration-{{ set_song.id }}-input"
+			id="set_song_duration-{{ set_song.id }}-input"
 			type="number"
 			value="{{ set_song.duration }}"
 			min="1"
 			max="{{ set_song.song.length }}"
+			onchange="update_duration({{ set_song.id }}, {{ set_song.song.length }})"
 		/>
 		ms (max {{ set_song.song.length }})
 	</td>
 	<td>
 		<button
-			onclick="update_set_song_start_and_duration(`{{ set_song.id }}`, `{{ set_song.id }}`)"
+			onclick="update_set_song({{ set_song.id }})"
 		>
 			Save
 		</button>

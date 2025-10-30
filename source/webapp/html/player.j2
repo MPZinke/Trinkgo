@@ -91,7 +91,7 @@
 		}
 
 
-		async play_set_song(id, on_play=() => {}, on_pause=() => {}, start=null, duration=null)
+		async play_set_song(set_song_id, on_play=() => {}, on_pause=() => {}, start=null, duration=null)
 		{
 			await this.pause();
 
@@ -103,11 +103,11 @@
 			}
 
 			let response = await fetch(
-				`/api/set_song/play`,
+				`/api/set_songs/${set_song_id}/play`,
 				{
 					method: `POST`,
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({player_id: this.id, id, start})
+					body: JSON.stringify({player_id: this.id, start})
 				}
 			);
 
@@ -126,11 +126,11 @@
 			this.on_pause = on_pause;
 
 			let response = await fetch(
-				`/api/song/play`,
+				`/api/songs/${id}/play`,
 				{
 					method: `POST`,
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({player_id: this.id, id})
+					body: JSON.stringify({player_id: this.id})
 				}
 			);
 

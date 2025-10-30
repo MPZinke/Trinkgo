@@ -163,7 +163,7 @@
 				{
 					method: `POST`,
 					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({player_id: PLAYER.id, set_song_id})
+					body: JSON.stringify({set_song_id})
 				}
 			);
 
@@ -179,13 +179,13 @@
 
 			document.getElementById(`unplayed_song_${response_json.set_song_id}-tr`).remove();
 
-			let on_play = () =>
+			let on_play = async () =>
 			{
 				let play_button = document.getElementById(`played_set_song_${response_json.set_song_id}-button`);
 				play_button.innerHTML = "Pause";
 				play_button.onclick = async () => await PLAYER.pause();
 			}
-			let on_pause = () =>
+			let on_pause = async () =>
 			{
 				let play_button = document.getElementById(`played_set_song_${response_json.set_song_id}-button`);
 				play_button.innerHTML = "Play Again";
@@ -199,7 +199,7 @@
 					);
 				};
 			}
-			await PLAYER.play_song(response_json.set_song_id, on_play, on_pause, null, response_json.duration);
+			await PLAYER.play_set_song(response_json.set_song_id, on_play, on_pause, null, response_json.duration);
 		}
 		catch(error)
 		{
@@ -215,21 +215,19 @@
 	{
 		button.disabled = true;
 
-		let on_play = () =>
-		{
-			button.innerHTML = "Pause";
-			button.onclick = async () => await PLAYER.pause();
-			button.disabled = false;
-		}
-
-		let on_pause = () =>
-		{
-			button.innerHTML = "Play Again";
-			button.onclick = async () => await play_again(button, set_song_id, start, duration);
-		}
-
 		try
 		{
+			let on_play = async () =>
+			{
+				button.innerHTML = "Pause";
+				button.onclick = async () => await PLAYER.pause();
+				button.disabled = false;
+			}
+			let on_pause = async () =>
+			{
+				button.innerHTML = "Play Again";
+				button.onclick = async () => await play_again(button, set_song_id, start, duration);
+			}
 			await PLAYER.play_set_song(set_song_id, on_play, on_pause, start, duration);
 		}
 		catch(error)

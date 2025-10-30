@@ -96,14 +96,14 @@ def select_set_songs_for_playlist_set(cursor: psycopg2.extras.RealDictCursor, pl
 
 
 @connect
-def update_song_start_and_duration(cursor: psycopg2.extras.RealDictCursor, set_song: SetSong) -> Song:
+def update_set_song(cursor: psycopg2.extras.RealDictCursor, set_song: SetSong) -> Song:
 	query = """
 		UPDATE "SongsSets"
-		SET "start" = %s, "duration" = %s
+		SET "label" = %s, "start" = %s, "duration" = %s
 		WHERE "id" = %s
 		  AND "is_deleted" = FALSE
 		RETURNING *;
 	"""
-	cursor.execute(query, (set_song.start, set_song.duration, set_song.id))
+	cursor.execute(query, (set_song.label, set_song.start, set_song.duration, set_song.id))
 
 	return dict(cursor.fetchone())

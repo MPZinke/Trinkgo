@@ -34,20 +34,16 @@ def render_template(template_path: str, **kwargs: dict) -> str:
 @api_blueprint.get("/api/play")
 @authorize
 def api_play():
-	# song = Song("7zLGHdfJ3JRPxvc96mEPEi", "Out Of Touch", 0)
-	# spotify.requests.player.play_song(TOKENS, song)
 	playlist = Playlist("49PAThhKRCCTXeydvq9uAp", "80's Stuff", [])
 	spotify.requests.player.play_playlist(app.tokens, playlist)
 	return ("", 204)
 
 
-@api_blueprint.post("/api/song/play")
+@api_blueprint.post("/api/songs/<int:id>/play")
 @authorize
-def api_song_play():
+def api_song_play(id: int):
 	request_json = request.json
-	print(request_json)
-	player_id: str = request_json.get("player_id")
-	id: str = request_json.get("id")
+	player_id: str = request_json["player_id"]
 
 	song: Song = database.songs.select_song(id)
 
@@ -55,13 +51,12 @@ def api_song_play():
 	return ("", 204)
 
 
-@api_blueprint.post("/api/set_song/play")
+@api_blueprint.post("/api/set_songs/<int:id>/play")
 @authorize
-def api_set_song_play():
+def api_set_songs_set_song_play(id: int):
 	request_json = request.json
-	player_id: str = request_json.get("player_id")
-	id: str = request_json.get("id")
-	start: Optional[str] = request_json.get("start")
+	player_id: str = request_json["player_id"]
+	start: Optional[str] = request_json["start"]
 
 	set_song: SetSong = database.set_songs.select_set_song(id)
 	if(start is not None):
@@ -71,35 +66,35 @@ def api_set_song_play():
 	return ("", 204)
 
 
-@api_blueprint.post("/api/set_song/update_start_and_duration")
+@api_blueprint.post("/api/set_songs/<int:id>/update")
 @authorize
-def api_song_save():
+def api_set_song_set_songs_update(id: int):
 	request_json = request.json
-	set_song_id: str = request_json.get("set_song_id")
-	start: int = request_json.get("start")
-	duration: int = request_json.get("duration")
+	label: int = request_json["label"]
+	start: int = request_json["start"]
+	duration: int = request_json["duration"]
 
 	set_song = SetSong(
-		id=set_song_id,
+		id=id,
+		label=label,
 		start=start,
 		duration=duration,
 		song=None,  # Sacrilege, I know.
 		playlist_set=None,
 	)
 
-	database.set_songs.update_song_start_and_duration(set_song)
+	database.set_songs.update_set_song(set_song)
 
 	return ("", 204)
 
 
-@api_blueprint.post("/api/rounds/<int:round_id>/played_set_songs/new")
+@api_blueprint.post("/api/rounds/<int:id>/played_set_songs/new")
 @authorize
-def api_rounds_round_play_next(round_id: int):
+def api_rounds_round_played_set_songs_new(id: int):
 	request_json = request.json
-	player_id: str = request_json.get("player_id")
-	set_song_id: Optional[str]|int = request_json.get("set_song_id")
+	set_song_id: Optional[str]|int = request_json["set_song_id"]
 
-	round: Round = database.rounds.select_round(round_id)
+	round: Round = database.rounds.select_round(id)
 	database.events.select_event_for_round(round)
 	database.playlist_sets.select_playlist_set_for_round(round)
 	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)

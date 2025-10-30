@@ -25,12 +25,14 @@ class SetSong:
 	def __init__(
 		self,
 		id: int,
+		label: str,
 		start: int,
 		duration: int,
 		song: Song,
 		playlist_set: Optional[object],
 	):
 		self.id: int = id
+		self.label: str = label
 		self.start: int = start
 		self.duration: int = duration
 		self.song: Song = song
@@ -44,6 +46,7 @@ class SetSong:
 	def __iter__(self):
 		yield from {
 			"id": self.id,
+			"label": self.label,
 			"start": self.start,
 			"duration": self.duration,
 			"song": dict(self.song),
@@ -59,6 +62,7 @@ class SetSong:
 	def from_dict(**set_song_dict: dict):
 		return SetSong(
 			id=set_song_dict["id"],
+			label=set_song_dict["label"],
 			start=set_song_dict["start"],
 			duration=set_song_dict["duration"],
 			song=set_song_dict["song"],
