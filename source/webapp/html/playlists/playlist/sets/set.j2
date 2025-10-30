@@ -73,61 +73,53 @@
 {% include("player.j2") %}
 
 <script>
-	async function get_start_and_play_song(button, uri)
+	async function get_start_and_play_song(button, id)
 	{
-		var play_buttons = document.getElementsByClassName("play-button");
-		for(var x = 0; x < play_buttons.length; x++)
+		button.disabled = true;
+
+		let on_play = () =>
 		{
-			let play_button = play_buttons[x];;
-			play_button.innerHTML = "Play";
-			let button_id = play_button.id.match(/play_([a-zA-Z0-9]{22})-button/)[1];
-			play_button.onclick = () => get_start_and_play_song(play_button, button_id);
+			button.innerHTML = "Pause";
+			button.onclick = async () => await PLAYER.pause();
+			button.disabled = false;
 		}
 
-		button.innerHTML = "Pause";
-		button.onclick = async () => update_button_and_pause(button, uri);
-
-
-		let start = document.getElementById(`song_start-${uri}-input`).value;
-		let action = function()
+		let on_pause = () =>
 		{
-			button.onclick = () => get_start_and_play_song(button, uri);
 			button.innerHTML = "Play";
-		};
-		let timer = new Timer(PLAYER, document.getElementById(`song_duration-${uri}-input`).value, action);
+			button.onclick = async () => get_start_and_play_song(button, id);
+		}
 
-		await PLAYER.play_song(uri, start, timer);
+		let start = document.getElementById(`song_start-${id}-input`).value;
+		let duration = document.getElementById(`song_duration-${id}-input`).value;
+		try
+		{
+			await PLAYER.play_set_song(id, on_play, on_pause, start, duration);
+		}
+		catch(error)
+		{
+			alert(error);
+		}
 	}
 
 
-	async function update_button_and_pause(button, uri)
-	{
-		button.onclick = async () => get_start_and_play_song(button, uri);
-		button.innerHTML = "Play";
-
-		await PLAYER.pause();
-	}
-
-
-	async function save(id, uri)
+	async function update_set_song_start_and_duration(id, id)
 	{
 		let playlist_id = window.location.pathname.split("/")[2];
 
-		let start = document.getElementById(`song_start-${uri}-input`).value;
-		let duration = document.getElementById(`song_duration-${uri}-input`).value;
-
-		let request = new Request(
-			`/api/set_song/save`,
-			{
-				method: `POST`,
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({playlist_id, set_song_id: id, start, duration})
-			}
-		)
+		let start = document.getElementById(`song_start-${id}-input`).value;
+		let duration = document.getElementById(`song_duration-${id}-input`).value;
 
 		try
 		{
-			let response = await fetch(request);
+			let response = await fetch(
+				`/api/set_song/update_start_and_duration`,
+				{
+					method: `POST`,
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({playlist_id, set_song_id: id, start, duration})
+				}
+			);
 			if(response.status != 204)
 			{
 				return alert(`${response.status}`+response.body);

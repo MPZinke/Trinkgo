@@ -79,15 +79,16 @@
 					{{ round.ended }}
 				</td>
 			</tr>
+			<tr>
+				<td>
+					<a
+						href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards"
+					>
+						Cards ({{ round.cards | length }})
+					</a>
+				</td>
+			</tr>
 		</table>
-
-		<h2>
-			<a
-				href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards"
-			>
-				Cards ({{ round.cards | length }})
-			</a>
-		</h2>
 
 		<table>
 			<tr>
@@ -121,13 +122,15 @@
 					<h2>
 						Played
 					</h2>
-					<table
-						id="played_songs-table"
-					>
-						{% for set_song in round.played_set_songs %}
-							{% set index=loop.index %}
-							{% include "events/event/rounds/round/play/_played_song.j2" with context %}
-						{% endfor %}
+					<table>
+						<tbody
+							id="played_songs-tbody"
+						>
+							{% for set_song in round.played_set_songs %}
+								{% set index=round.played_set_songs|length - loop.index + 1 %}
+								{% include "events/event/rounds/round/play/_played_song.j2" with context %}
+							{% endfor %}
+						</tbody>
 					</table>
 				</td>
 			</tr>
@@ -138,48 +141,90 @@
 {% include("player.j2") %}
 
 <script>
+	const PLAYED_SONGS_TABLE = document.getElementById("played_songs-tbody");
+
+
 	function play_random()
 	{
 
 	}
 
 
-	async function play_next(set_song_id, duration)
+	async function play_next(button, set_song_id, duration)
 	{
-		if(PLAYER.playing !== null)
+		button.disabled = true;
+
+		let on_play = () =>
 		{
-			await PLAYER.player.pause();
-			PLAYER.clear_timer();
+			let play_button = document.getElementById(`played_set_song_${set_song_id}-button`);
+			play_button.innerHTML = "Pause";
+			play_button.onclick = async () => await PLAYER.pause();
 		}
-		PLAYER.timer = new Timer(PLAYER, duration);
 
-		let request = new Request(
-			`/api/rounds/{{ round.id }}/play_next`,
-			{
-				method: `POST`,
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({player_id: PLAYER.id, set_song_id})
-			}
-		)
+		let on_pause = () =>
+		{
+			let play_button = document.getElementById(`played_set_song_${set_song_id}-button`);
+			play_button.innerHTML = "Play Again";
+			play_button.onclick = async () => play_again(play_button, set_song_id, start, duration);
+		}
 
-		let response;
 		try
 		{
-			response = await fetch(request);
+			let response = await fetch(
+				`/api/rounds/{{ round.id }}/played_set_songs/new`,
+				{
+					method: `POST`,
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({player_id: PLAYER.id, set_song_id})
+				}
+			);
+
 			if(response.status != 200)
 			{
-				return alert(`${response.status}`+response.body);
+				throw new Error(`Unexpected ${response.status} Error: ${await response.text()}`);
 			}
+			let response_json = await response.json();
+
+			let created_element = document.createElement("tbody");
+			created_element.innerHTML = response_json.html;
+			PLAYED_SONGS_TABLE.prepend(created_element.firstChild);
+
+			document.getElementById(`unplayed_song_${set_song_id}-tr`).remove();
+
+			await PLAYER.play_song(set_song_id, on_play, on_pause, null, response_json.duration);
 		}
 		catch(error)
 		{
 			console.error(error);
 			alert(error);
 		}
+	}
 
-		document.getElementById(`unplayed_song_${set_song_id}-tr`).remove();
 
-		// remove from left hand side
-		// add to right hand side
+	async function play_again(button, set_song_id, start, duration)
+	{
+		button.disabled = true;
+
+		let on_play = () =>
+		{
+			button.innerHTML = "Pause";
+			button.onclick = async () => await PLAYER.pause();
+			button.disabled = false;
+		}
+
+		let on_pause = () =>
+		{
+			button.innerHTML = "Play Again";
+			button.onclick = async () => play_again(button, set_song_id, start, duration);
+		}
+
+		try
+		{
+			await PLAYER.play_set_song(set_song_id, on_play, on_pause, start, duration);
+		}
+		catch(error)
+		{
+			alert(error);
+		}
 	}
 </script>

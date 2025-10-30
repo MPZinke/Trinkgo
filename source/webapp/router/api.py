@@ -12,7 +12,7 @@ import requests
 import database
 import spotify
 from spotify.classes import Playlist, Song
-from trinkgo.classes import Round
+from trinkgo.classes import Round, SetSong
 from webapp.router import app
 from webapp.router.auth import authorize
 
@@ -41,46 +41,58 @@ def api_play():
 	return ("", 204)
 
 
-@api_blueprint.post("/api/play_song")
+@api_blueprint.post("/api/song/play")
 @authorize
-def api_play_song():
+def api_song_play():
 	request_json = request.json
 	print(request_json)
 	player_id: str = request_json.get("player_id")
-	uri: str = request_json.get("uri")
-	start: Optional[int] = request_json.get("start", 0)
+	id: str = request_json.get("id")
 
-	song = Song(
-		id=0,
-		uri=uri,
-		title=None,
-		album=None,
-		artists=None,
-		artwork=None,
-		length=None,
-		released=None,
-		playlist=None,
-	)
+	song: Song = database.song.select_song(id)
 
-	spotify.requests.player.play_song(app.tokens, player_id, song, start)
+	spotify.requests.player.play_song(app.tokens, player_id, song)
 	return ("", 204)
 
 
-@api_blueprint.post("/api/set_song/save")
+@api_blueprint.post("/api/set_song/play")
+@authorize
+def api_set_song_play():
+	request_json = request.json
+	player_id: str = request_json.get("player_id")
+	id: str = request_json.get("id")
+	start: str = request_json.get("start")
+
+	set_song: SetSong = database.set_song.select_set_song(id)
+	if(isinstance(start, str) and start.isnumeric()):
+		set_song.start = int(start)
+
+	spotify.requests.player.play_song(app.tokens, player_id, set_song.song, set_song.start)
+	return ("", 204)
+
+
+@api_blueprint.post("/api/set_song/update_start_and_duration")
 @authorize
 def api_song_save():
 	request_json = request.json
-	playlist_id: str = request_json.get("playlist_id")
 	set_song_id: str = request_json.get("set_song_id")
 	start: int = request_json.get("start")
 	duration: int = request_json.get("duration")
 
-	database.song.update_song_start_and_duration(set_song_id, start, duration)
+	set_song = SetSong(
+		id=set_song_id,
+		start=start,
+		duration=duration,
+		song=None,  # Sacrilege, I know.
+		playlist_set=None,
+	)
+
+	database.set_song.update_song_start_and_duration(set_song)
 
 	return ("", 204)
 
 
-@api_blueprint.post("/api/rounds/<int:round_id>/play_next")
+@api_blueprint.post("/api/rounds/<int:round_id>/played_set_songs/new")
 @authorize
 def api_rounds_round_play_next(round_id: int):
 	request_json = request.json
@@ -94,17 +106,16 @@ def api_rounds_round_play_next(round_id: int):
 	database.played_set_song.select_played_set_songs_for_round(round)
 
 	set_song = next(filter(lambda set_song: set_song.id == set_song_id, round.playlist_set.set_songs))
-
 	database.played_set_song.insert_played_set_song(set_song, round)
 
-	played_set_song_html = render_template(
-		"events/event/rounds/round/play/_played_song.j2",
-		index=len(round.played_set_songs),
-		set_song=set_song
-	)
-
-	spotify.requests.player.play_song(app.tokens, player_id, set_song.song, set_song.start)
-	return (played_set_song_html, 200)
+	return {
+		"duration": set_song.duration,
+		"html": render_template(
+			"events/event/rounds/round/play/_played_song.j2",
+			index=len(round.played_set_songs),
+			set_song=set_song
+		)
+	}
 
 
 @api_blueprint.get("/api/next")

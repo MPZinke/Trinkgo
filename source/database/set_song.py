@@ -23,6 +23,40 @@ from trinkgo.classes import PlaylistSet, SetSong
 
 
 @connect
+def select_set_song(cursor: psycopg2.extras.RealDictCursor, id: int):
+	query = """
+		SELECT
+			"SongsSets".*,
+			"Songs"."uri" AS "Songs.uri",
+			"Songs"."title" AS "Songs.title",
+			"Songs"."album" AS "Songs.album",
+			"Songs"."artists" AS "Songs.artists",
+			"Songs"."artwork" AS "Songs.artwork",
+			"Songs"."length" AS "Songs.length",
+			"Songs"."released" AS "Songs.released"
+		FROM "SongsSets"
+		JOIN "Songs" ON "SongsSets"."Songs.id" = "Songs"."id"
+		WHERE "SongsSets"."id" = %s
+		ORDER BY "id" ASC;
+	"""
+	cursor.execute(query, (id,))
+	set_song_dict = cursor.fetchone()
+
+	song = Song(
+		id=set_song_dict["Songs.id"],
+		uri=set_song_dict["Songs.uri"],
+		title=set_song_dict["Songs.title"],
+		album=set_song_dict["Songs.album"],
+		artists=set_song_dict["Songs.artists"],
+		artwork=set_song_dict["Songs.artwork"],
+		length=set_song_dict["Songs.length"],
+		released=set_song_dict["Songs.released"],
+		playlist=None,
+	)
+	return SetSong.from_dict(song=song, **set_song_dict)
+
+
+@connect
 def select_set_songs_for_playlist_set(cursor: psycopg2.extras.RealDictCursor, playlist_set: PlaylistSet):
 	query = """
 		SELECT
@@ -59,3 +93,17 @@ def select_set_songs_for_playlist_set(cursor: psycopg2.extras.RealDictCursor, pl
 		set_song = SetSong.from_dict(song=song, playlist_set=playlist_set, **set_song_dict)
 		playlist_set.set_songs.append(set_song)
 		playlist_set.playlist.songs.append(song)
+
+
+@connect
+def update_song_start_and_duration(cursor: psycopg2.extras.RealDictCursor, set_song: SetSong) -> Song:
+	query = """
+		UPDATE "SongsSets"
+		SET "start" = %s, "duration" = %s
+		WHERE "id" = %s
+		  AND "is_deleted" = FALSE
+		RETURNING *;
+	"""
+	cursor.execute(query, (set_song.start, set_song.duration, set_song.id))
+
+	return dict(cursor.fetchone())

@@ -29,12 +29,12 @@ def insert_played_set_song(cursor: psycopg2.extras.RealDictCursor, set_song: Set
 	if(round.played_set_songs is None):
 		round.played_set_songs = []
 
-	round.played_set_songs.append(set_song)
+	round.played_set_songs.insert(0, set_song)
 
 
 @connect
 def select_played_set_songs_for_round(cursor: psycopg2.extras.RealDictCursor, round: Round) -> None:
-	query = """SELECT * FROM "PlayedSongsSets" WHERE "Rounds.id" = %s;"""
+	query = """SELECT * FROM "PlayedSongsSets" WHERE "Rounds.id" = %s ORDER BY "id" DESC;"""
 	cursor.execute(query, (round.id,))
 
 	round.played_set_songs = []

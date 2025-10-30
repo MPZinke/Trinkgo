@@ -35,7 +35,7 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 auth_blueprint = Blueprint('auth_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
 
 
-REDIRECT = None
+REDIRECT = None  # TODO: Move to session
 
 
 def authorize(function: callable) -> callable:

@@ -20,9 +20,8 @@
 	</td>
 	<td>
 		<button
-			id="play_{{ set_song.song.uri }}-button"
-			class="play-button"
-			onclick="play_next(this, `{{ set_song.song.uri }}`)"
+			id="played_set_song_{{ set_song.id }}-button"
+			onclick="play_again(this, {{ set_song.id }}, {{ set_song.start }}, {{ set_song.duration }})"
 		>
 			Play Again
 		</button>
