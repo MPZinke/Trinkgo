@@ -27,7 +27,6 @@ import requests
 
 
 import database
-from webapp.router import app
 import spotify
 from spotify.auth import SpotifyUserAuth
 

@@ -19,13 +19,13 @@ from pathlib import Path
 
 
 from flask import redirect, render_template, request, Blueprint
+from flask_login import login_required
 import requests
 
 
 import database
 import spotify
 from trinkgo.classes import Event, PlaylistSet, Round
-from webapp.router import app
 from webapp.router.events.rounds import rounds_blueprint
 
 
@@ -40,6 +40,7 @@ events_blueprint.register_blueprint(rounds_blueprint)
 
 @events_blueprint.get("/events")
 @events_blueprint.get("/events/")
+@login_required
 def GET_events():
 	events = database.events.select_events()
 	database.rounds.select_rounds_for_events(events)
@@ -47,11 +48,13 @@ def GET_events():
 
 
 @events_blueprint.get("/events/new")
+@login_required
 def GET_events_new():
 	return render_template("events/new.j2", date=date_type.today().strftime("%Y-%m-%d"))
 
 
 @events_blueprint.post("/events/new")
+@login_required
 def POST_events_new():
 	name = request.form.get("event_name-input")
 	date = request.form.get("event_date-input")
@@ -71,6 +74,7 @@ def POST_events_new():
 
 
 @events_blueprint.get("/events/<int:id>")
+@login_required
 def GET_events_event(id: int):
 	event: Event = database.events.select_event(id)
 	database.rounds.select_rounds_for_event(event)

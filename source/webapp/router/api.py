@@ -14,7 +14,6 @@ import database
 import spotify
 from spotify.classes import Playlist, Song
 from trinkgo.classes import Round, SetSong
-from webapp.router import app
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]

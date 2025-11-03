@@ -17,6 +17,7 @@ __author__ = "MPZinke"
 import base64
 from pathlib import Path
 import random
+import secrets
 import string
 from typing import Optional
 import urllib.parse
@@ -29,6 +30,11 @@ import requests
 import database
 import spotify
 from spotify.classes import Playlist, Song
+from webapp.router.api import api_blueprint
+from webapp.router.auth import auth_blueprint, login_manager
+from webapp.router.events import events_blueprint
+from webapp.router.home import home_blueprint
+from webapp.router.playlists import playlists_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -37,10 +43,13 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
 app = Flask("Trinkgo", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-app.secret_key = "yes"  # TODO: Make dynamic
-
-
-# TODO: move blueprint registration here
+app.secret_key = secrets.token_hex(64)
+login_manager.init_app(app)
+app.register_blueprint(api_blueprint)
+app.register_blueprint(auth_blueprint)
+app.register_blueprint(events_blueprint)
+app.register_blueprint(home_blueprint)
+app.register_blueprint(playlists_blueprint)
 
 
 @app.get("/favicon.ico")

@@ -20,6 +20,7 @@ from pathlib import Path
 
 
 from flask import redirect, render_template, request, send_file, Blueprint
+from flask_login import login_required
 import requests
 
 
@@ -27,7 +28,6 @@ import database
 import spotify
 from trinkgo.create_card import create_cards
 from trinkgo.classes import Card, Event, PlaylistSet, Round
-from webapp.router import app
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[3]
@@ -39,6 +39,7 @@ cards_blueprint = Blueprint('cards_blueprint', __name__, template_folder=HTML_DI
 
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards")
+@login_required
 def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
 	round: Round = database.rounds.select_round(round_id)
 	database.events.select_event_for_round(round)
@@ -49,6 +50,7 @@ def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
 
 
 @cards_blueprint.post("/events/<int:event_id>/rounds/<int:round_id>/cards/new")
+@login_required
 def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
 	number_of_cards: int = int(request.form.get("number_of_cards-input"))
 
@@ -65,6 +67,7 @@ def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
 
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/all")
+@login_required
 def GET_events_event_rounds_round_cards_all(event_id: int, round_id: int):
 	round: Round = database.rounds.select_round(round_id)
 	database.events.select_event_for_round(round)
@@ -79,6 +82,7 @@ def GET_events_event_rounds_round_cards_all(event_id: int, round_id: int):
 
 
 @cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/<int:card_id>")
+@login_required
 def GET_events_event_rounds_round_cards_card(event_id: int, round_id: int, card_id: int):
 	card: Card = database.cards.select_card(card_id)
 	database.rounds.select_round_for_card(card)

@@ -13,7 +13,6 @@ import database
 import spotify
 from spotify.classes import Playlist
 from trinkgo.classes import PlaylistSet
-from webapp.router import app
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -43,7 +42,7 @@ def POST_playlists_new():
 	playlist_link = request.form.get("playlist_link-input")
 	path = Path(urllib.parse.urlparse(playlist_link).path)
 
-	playlist = spotify.requests.data.get_playlist(app.tokens, path.name)
+	playlist = spotify.requests.data.get_playlist(current_user, path.name)
 	database.playlists.insert_playlist(playlist)
 
 	return redirect(f"/playlists/{playlist.id}")
