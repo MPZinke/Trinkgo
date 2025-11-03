@@ -37,7 +37,10 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
 app = Flask("Trinkgo", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-app.secret_key = "yes"
+app.secret_key = "yes"  # TODO: Make dynamic
+
+
+# TODO: move blueprint registration here
 
 
 @app.get("/favicon.ico")

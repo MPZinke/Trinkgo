@@ -20,6 +20,9 @@ import traceback
 from typing import Optional
 
 
+import flask_login
+
+
 import spotify
 
 
@@ -51,6 +54,7 @@ class SpotifyUserAuth:
 			auth_data: dict = spotify.requests.auth.refresh_access_token(self._refresh_token)
 			self._access_token = auth_data.get("access_token")
 			self._expiration = datetime.now() + timedelta(seconds=auth_data.get("expires_in"))
+			flask_login.login_user(self)
 
 		print(self._access_token)
 		return self._access_token
@@ -68,6 +72,7 @@ class SpotifyUserAuth:
 			auth_data: dict = spotify.requests.auth.refresh_access_token(self._refresh_token)
 			self._access_token = auth_data.get("access_token")
 			self._expiration = datetime.now() + timedelta(seconds=auth_data.get("expires_in"))
+			flask_login.login_user(self)
 			return True
 
 		except Exception:

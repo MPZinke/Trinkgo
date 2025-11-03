@@ -20,7 +20,7 @@ from pathlib import Path
 import urllib.parse
 
 
-from flask import redirect, render_template, request, Blueprint
+from flask import redirect, render_template, request, session, Blueprint
 import flask_login
 from flask_login import login_required
 import requests
@@ -38,9 +38,6 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
 auth_blueprint = Blueprint('auth_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-
-
-REDIRECT = None  # TODO: Move to session
 
 
 login_manager = flask_login.LoginManager()
@@ -61,6 +58,7 @@ def load_user(auth_json: str):
 
 @login_manager.unauthorized_handler
 def unauthorized():
+	session["redirect"] = request.full_path
 	return redirect("/login")
 
 
@@ -104,8 +102,10 @@ def authenticated():
 		expiration=datetime.now() + timedelta(seconds=auth_data["expires_in"]),
 		refresh_token=auth_data["refresh_token"],
 	)
-
 	flask_login.login_user(user)
+
+	if("redirect" in session):
+		return redirect(session.pop("redirect"))
 
 	return redirect("/home")
 
@@ -115,45 +115,3 @@ def authenticated():
 def logout():
 	flask_login.logout_user()
 	return redirect("/")
-
-
-
-
-# ————————————————————————————————————————————————————— SPOTIFY  ————————————————————————————————————————————————————— #
-
-@auth_blueprint.get("/spotify/login")
-def GET_spotify_login():
-	# FROM: https://developer.spotify.com/documentation/web-playback-sdk/howtos/web-app-player
-	#    @: Request User Authorization
-	global REDIRECT
-
-	REDIRECT = request.args.get("post_login_redirect")
-
-	params = {
-		"response_type": "code",
-		"client_id": "8dc7f8b757934d9ebaf39f9347bccc56",
-		"scope": "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
-		"state": "",
-		"redirect_uri": "http://127.0.0.1:8080/spotify/authenticated",
-	}
-	param_string = urllib.parse.urlencode(params)
-
-	return redirect(f"https://accounts.spotify.com/authorize?{param_string}")
-
-
-@auth_blueprint.route("/spotify/authenticated")
-def GET_spotify_authenticated():
-	global REDIRECT
-
-	code = request.args.get("code")
-	if(code is None):
-		raise Exception("URL parameter `code` is missing.")
-
-	app.tokens.code = code
-
-	if(REDIRECT is not None):
-		post_login_redirect = REDIRECT
-		REDIRECT = None
-		return redirect(post_login_redirect)
-
-	return redirect("/home")
