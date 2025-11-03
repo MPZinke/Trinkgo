@@ -28,7 +28,6 @@ import requests
 
 import database
 import spotify
-from spotify.auth import Tokens
 from spotify.classes import Playlist, Song
 
 
@@ -38,8 +37,7 @@ STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
 app = Flask("Trinkgo", template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
-app.tokens = Tokens()
-app.context_processor(app.tokens.context_processor)
+app.secret_key = "yes"
 
 
 @app.get("/favicon.ico")

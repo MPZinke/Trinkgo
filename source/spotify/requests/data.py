@@ -18,11 +18,11 @@ from datetime import date as date_type
 import requests
 
 
-from spotify.auth import Tokens
+from spotify.auth import SpotifyUserAuth
 from spotify.classes import Playlist, Song
 
 
-def get_playlist(tokens: Tokens, uri: str) -> Playlist:
+def get_playlist(tokens: SpotifyUserAuth, uri: str) -> Playlist:
 	url = (
 		f"https://api.spotify.com/v1/playlists/{uri}"
 		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,album.release_date,artists(name))"

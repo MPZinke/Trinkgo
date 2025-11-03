@@ -5,6 +5,7 @@ from typing import Optional
 
 
 from flask import request, Blueprint
+from flask_login import current_user, login_required
 from jinja2 import Environment, FileSystemLoader
 import requests
 
@@ -14,7 +15,6 @@ import spotify
 from spotify.classes import Playlist, Song
 from trinkgo.classes import Round, SetSong
 from webapp.router import app
-from webapp.router.auth import authorize
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -26,33 +26,33 @@ api_blueprint = Blueprint('api_blueprint', __name__, template_folder=HTML_DIRECT
 
 
 def render_template(template_path: str, **kwargs: dict) -> str:
-	env = Environment(loader = FileSystemLoader(HTML_DIRECTORY))
+	env = Environment(loader=FileSystemLoader(HTML_DIRECTORY))
 	template = env.get_template(template_path)
 	return template.render(**kwargs)
 
 
 @api_blueprint.get("/api/play")
-@authorize
+@login_required
 def api_play():
 	playlist = Playlist("49PAThhKRCCTXeydvq9uAp", "80's Stuff", [])
-	spotify.requests.player.play_playlist(app.tokens, playlist)
+	spotify.requests.player.play_playlist(current_user, playlist)
 	return ("", 204)
 
 
 @api_blueprint.post("/api/songs/<int:id>/play")
-@authorize
+@login_required
 def api_song_play(id: int):
 	request_json = request.json
 	player_id: str = request_json["player_id"]
 
 	song: Song = database.songs.select_song(id)
 
-	spotify.requests.player.play_song(app.tokens, player_id, song)
+	spotify.requests.player.play_song(current_user, player_id, song)
 	return ("", 204)
 
 
 @api_blueprint.post("/api/set_songs/<int:id>/play")
-@authorize
+@login_required
 def api_set_songs_set_song_play(id: int):
 	request_json = request.json
 	player_id: str = request_json["player_id"]
@@ -62,12 +62,12 @@ def api_set_songs_set_song_play(id: int):
 	if(start is not None):
 		set_song.start = int(start)
 
-	spotify.requests.player.play_song(app.tokens, player_id, set_song.song, set_song.start)
+	spotify.requests.player.play_song(current_user, player_id, set_song.song, set_song.start)
 	return ("", 204)
 
 
 @api_blueprint.post("/api/set_songs/<int:id>/update")
-@authorize
+@login_required
 def api_set_song_set_songs_update(id: int):
 	request_json = request.json
 	label: int = request_json["label"]
@@ -89,7 +89,7 @@ def api_set_song_set_songs_update(id: int):
 
 
 @api_blueprint.post("/api/rounds/<int:id>/played_set_songs/new")
-@authorize
+@login_required
 def api_rounds_round_played_set_songs_new(id: int):
 	request_json = request.json
 	set_song_id: Optional[str]|int = request_json["set_song_id"]
@@ -120,15 +120,15 @@ def api_rounds_round_played_set_songs_new(id: int):
 
 
 @api_blueprint.get("/api/next")
-@authorize
+@login_required
 def api_next():
-	spotify.requests.player.play_next(app.tokens)
+	spotify.requests.player.play_next(current_user)
 	return ("", 204)
 
 
 @api_blueprint.post("/api/pause")
-@authorize
+@login_required
 def api_pause():
 	player_id: str = request.json.get("player_id")
-	spotify.requests.pause(app.tokens, player_id)
+	spotify.requests.pause(current_user, player_id)
 	return ("", 204)

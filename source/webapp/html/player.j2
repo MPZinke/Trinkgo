@@ -16,7 +16,7 @@
 			this.player = new window.Spotify.Player(
 				{
 					name: 'trinkgo',
-					getOAuthToken: cb => { cb("{{ access_token }}"); },
+					getOAuthToken: cb => { cb("{{ current_user.access_token }}"); },
 					volume: 0.5,
 				}
 			);

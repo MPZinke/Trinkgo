@@ -5,6 +5,7 @@ import urllib.parse
 
 
 from flask import redirect, render_template, request, Blueprint
+from flask_login import current_user, login_required
 import requests
 
 
@@ -13,7 +14,6 @@ import spotify
 from spotify.classes import Playlist
 from trinkgo.classes import PlaylistSet
 from webapp.router import app
-from webapp.router.auth import authorize
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -32,13 +32,13 @@ def GET_playlists():
 
 
 @playlists_blueprint.get("/playlists/new")
-@authorize
+@login_required
 def GET_playlists_new():
 	return render_template("playlists/new.j2")
 
 
 @playlists_blueprint.post("/playlists/new")
-@authorize
+@login_required
 def POST_playlists_new():
 	playlist_link = request.form.get("playlist_link-input")
 	path = Path(urllib.parse.urlparse(playlist_link).path)
@@ -50,7 +50,7 @@ def POST_playlists_new():
 
 
 @playlists_blueprint.get("/playlists/<int:id>")
-@authorize
+@login_required
 def GET_playlists_playlist(id: int):
 	playlist: Playlist = database.playlists.select_playlist(id)
 	database.songs.select_songs_for_playlist(playlist)
@@ -60,7 +60,7 @@ def GET_playlists_playlist(id: int):
 
 
 @playlists_blueprint.get("/playlists/<int:id>/songs")
-@authorize
+@login_required
 def GET_playlists_playlist_songs(id: int):
 	playlist: Playlist = database.playlists.select_playlist(id)
 	playlist_sets: list[PlaylistSet] = database.playlist_sets.select_playlist_sets()
@@ -71,7 +71,7 @@ def GET_playlists_playlist_songs(id: int):
 # ——————————————— SETS ——————————————— #
 
 @playlists_blueprint.get("/playlists/<int:id>/sets")
-@authorize
+@login_required
 def GET_playlists_playlist_sets(id: int):
 	playlist: Playlist = database.playlists.select_playlist(id)
 	playlist_sets: list[PlaylistSet] = database.playlist_sets.select_playlist_sets()
@@ -80,7 +80,7 @@ def GET_playlists_playlist_sets(id: int):
 
 
 @playlists_blueprint.get("/playlists/<int:id>/sets/new")
-@authorize
+@login_required
 def GET_playlists_playlist_sets_new(id: int):
 	playlist = database.playlists.select_playlist(id)
 
@@ -88,7 +88,7 @@ def GET_playlists_playlist_sets_new(id: int):
 
 
 @playlists_blueprint.post("/playlists/<int:id>/sets/new")
-@authorize
+@login_required
 def POST_playlists_playlist_sets_new(id: int):
 	set_name = request.form.get("set_name-input")
 
@@ -101,7 +101,7 @@ def POST_playlists_playlist_sets_new(id: int):
 
 
 @playlists_blueprint.get("/playlists/<int:playlist_id>/sets/<int:playlist_set_id>")
-@authorize
+@login_required
 def GET_playlists_playlist_sets_set(playlist_id: int, playlist_set_id: int):
 	playlist_set = database.playlist_sets.select_playlist_set(playlist_set_id)
 	database.set_songs.select_set_songs_for_playlist_set(playlist_set)

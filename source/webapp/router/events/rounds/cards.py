@@ -28,7 +28,6 @@ import spotify
 from trinkgo.create_card import create_cards
 from trinkgo.classes import Card, Event, PlaylistSet, Round
 from webapp.router import app
-from webapp.router.auth import authorize
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[3]

@@ -17,11 +17,11 @@ __author__ = "MPZinke"
 import requests
 
 
-from spotify.auth import Tokens
+from spotify.auth import SpotifyUserAuth
 from spotify.classes import Playlist, Song
 
 
-def play_previous(tokens: Tokens, player_id: str):
+def play_previous(tokens: SpotifyUserAuth, player_id: str):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/skip-users-playback-to-previous-track
 	url = f"https://api.spotify.com/v1/me/player/previous?device_id={player_id}"
 	headers = {
@@ -33,7 +33,7 @@ def play_previous(tokens: Tokens, player_id: str):
 	return response.status_code != 204
 
 
-def play_playlist(tokens: Tokens, player_id: str, playlist: Playlist):
+def play_playlist(tokens: SpotifyUserAuth, player_id: str, playlist: Playlist):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
 	#  AND: https://stackoverflow.com/questions/68047533/spotify-web-api-how-to-play-a-playlist
 	url = f"https://api.spotify.com/v1/me/player/play?device_id={player_id}"
@@ -47,7 +47,7 @@ def play_playlist(tokens: Tokens, player_id: str, playlist: Playlist):
 	return response.status_code != 204
 
 
-def play_song(tokens: Tokens, player_id: str, song: Song, start: int=0):
+def play_song(tokens: SpotifyUserAuth, player_id: str, song: Song, start: int=0):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback
 	url = f"https://api.spotify.com/v1/me/player/play?device_id={player_id}"
 	headers = {
@@ -60,7 +60,7 @@ def play_song(tokens: Tokens, player_id: str, song: Song, start: int=0):
 	return response.status_code != 204
 
 
-def pause(tokens: Tokens, player_id: str):
+def pause(tokens: SpotifyUserAuth, player_id: str):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/pause-a-users-playback
 	url = f"https://api.spotify.com/v1/me/player/pause?device_id={player_id}"
 	headers = {
@@ -72,7 +72,7 @@ def pause(tokens: Tokens, player_id: str):
 	return response.status_code != 204
 
 
-def play_next(tokens: Tokens, player_id: str):
+def play_next(tokens: SpotifyUserAuth, player_id: str):
 	# FROM: https://developer.spotify.com/documentation/web-api/reference/skip-users-playback-to-next-track
 	url = f"https://api.spotify.com/v1/me/player/next?device_id={player_id}"
 	headers = {
@@ -85,7 +85,7 @@ def play_next(tokens: Tokens, player_id: str):
 
 
 
-def get_playlist(tokens: Tokens, playlist_id: str) -> Playlist:
+def get_playlist(tokens: SpotifyUserAuth, playlist_id: str) -> Playlist:
 	url = (
 		f"https://api.spotify.com/v1/playlists/{playlist_id}"
 		"?fields=name,tracks.items(track(id,name,duration_ms,album.images,album.name,artists(name))"

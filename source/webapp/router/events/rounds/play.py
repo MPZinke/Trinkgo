@@ -20,6 +20,7 @@ from pathlib import Path
 
 
 from flask import redirect, render_template, request, send_file, Blueprint
+from flask_login import current_user, login_required
 import requests
 
 
@@ -27,7 +28,6 @@ import database
 import spotify
 from trinkgo.classes import Card, Event, PlaylistSet, Round
 from webapp.router import app
-from webapp.router.auth import authorize
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[3]
@@ -39,7 +39,7 @@ play_blueprint = Blueprint('play_blueprint', __name__, template_folder=HTML_DIRE
 
 
 @play_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/play")
-@authorize
+@login_required
 def GET_events_event_rounds_round_play(event_id: int, round_id: int):
 	round: Round = database.rounds.select_round(round_id)
 	database.events.select_event_for_round(round)

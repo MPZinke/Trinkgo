@@ -18,12 +18,12 @@ from pathlib import Path
 
 
 from flask import render_template, Blueprint
+from flask_login import current_user, login_required
 import requests
 
 
 import database
 import spotify
-from webapp.router.auth import authorize
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
@@ -36,12 +36,12 @@ home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRE
 
 @home_blueprint.get("/")
 @home_blueprint.get("/home")
-@authorize
+@login_required
 def GET_home():
 	return render_template("index.j2")
 
 
 @home_blueprint.get("/player")
-@authorize
+@login_required
 def GET_play():
 	return render_template("play.j2")

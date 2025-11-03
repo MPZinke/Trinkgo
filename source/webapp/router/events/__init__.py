@@ -26,7 +26,6 @@ import database
 import spotify
 from trinkgo.classes import Event, PlaylistSet, Round
 from webapp.router import app
-from webapp.router.auth import authorize
 from webapp.router.events.rounds import rounds_blueprint
 
 

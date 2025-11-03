@@ -17,13 +17,14 @@ __author__ = "MPZinke"
 from spotify.classes import Song
 from webapp.router import app
 from webapp.router.api import api_blueprint
-from webapp.router.auth import auth_blueprint
+from webapp.router.auth import auth_blueprint, login_manager
 from webapp.router.events import events_blueprint
 from webapp.router.home import home_blueprint
 from webapp.router.playlists import playlists_blueprint
 
 
 def main():
+	login_manager.init_app(app)
 	app.register_blueprint(api_blueprint)
 	app.register_blueprint(auth_blueprint)
 	app.register_blueprint(events_blueprint)
