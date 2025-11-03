@@ -86,6 +86,7 @@ DROP TABLE IF EXISTS "PlayedSongsSets" CASCADE;
 CREATE TABLE "PlayedSongsSets"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
+	"played_at" NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	"Rounds.id" INT NOT NULL,
 	"SongsSets.id" INT NOT NULL,
 	FOREIGN KEY ("Rounds.id") REFERENCES "Rounds" ("id"),
@@ -100,8 +101,10 @@ CREATE TABLE "Cards"
 	"id" SERIAL NOT NULL PRIMARY KEY,
 	"identifier" VARCHAR(4) NOT NULL,
 	"size" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
+	"PlayedSongsSets" INT DEFAULT NULL,
 	"Rounds.id" INT NOT NULL,
 	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
+	FOREIGN KEY ("PlayedSongsSets.id") REFERENCES "PlayedSongsSets" ("id"),
 	FOREIGN KEY ("Rounds.id") REFERENCES "Rounds" ("id"),
 	UNIQUE ("identifier", "Rounds.id")
 );
@@ -112,9 +115,9 @@ CREATE TABLE "CardsSongsSets"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
 	"position" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
-	"SongsSets.id" INT NOT NULL,
 	"Cards.id" INT NOT NULL,
+	"SongsSets.id" INT NOT NULL,
 	UNIQUE ("position", "Cards.id"),
-	FOREIGN KEY ("SongsSets.id") REFERENCES "SongsSets" ("id"),
-	FOREIGN KEY ("Cards.id") REFERENCES "Cards" ("id")
+	FOREIGN KEY ("Cards.id") REFERENCES "Cards" ("id"),
+	FOREIGN KEY ("SongsSets.id") REFERENCES "SongsSets" ("id")
 );

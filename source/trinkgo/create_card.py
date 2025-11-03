@@ -34,7 +34,7 @@ def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[Set
 	return card_songs
 
 
-# TODO: Create for album, artist, label, etc.
+# TODO: Creatable for album, artist, label, etc.
 # TODO: Round type (cross out, black out, etc)
 # TODO: Add card win detection
 def create_card(round: Round, freespot: bool=True, repeat: bool=False):

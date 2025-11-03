@@ -68,6 +68,7 @@ def GET_playlists_playlist_songs(id: int):
 
 
 # ——————————————— SETS ——————————————— #
+# TODO: Move to submodule
 
 @playlists_blueprint.get("/playlists/<int:id>/sets")
 @login_required

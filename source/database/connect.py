@@ -18,9 +18,9 @@ def connect(function: callable) -> callable:
 		RETURNS: Value(s) if values.
 		THROWS:  Whatever exceptions occur during function call.
 		"""
-		DB_user: str = "mpzinke"
-		DB_host: str = "localhost"
-		DB_password: str = ""
+		DB_host: str = os.getenv("DB_HOST", "localhost")
+		DB_user: str = os.getenv("DB_USER", "trinkgo")
+		DB_password: str = os.getenv("DB_PASSWORD", "")
 
 		connection_string = f"host={DB_host} dbname=Trinkgo user={DB_user} password={DB_password}"
 		with psycopg2.connect(connection_string) as connection:

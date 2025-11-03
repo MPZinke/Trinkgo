@@ -14,12 +14,11 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from spotify.classes import Song
 from webapp.router import app
 
 
 def main():
-	app.run(host="0.0.0.0", port=8080, debug=True)
+	app.run(host="0.0.0.0", port=443, debug=True)
 
 
 main()

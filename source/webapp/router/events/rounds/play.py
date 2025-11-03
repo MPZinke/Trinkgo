@@ -40,6 +40,7 @@ play_blueprint = Blueprint('play_blueprint', __name__, template_folder=HTML_DIRE
 @play_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/play")
 @login_required
 def GET_events_event_rounds_round_play(event_id: int, round_id: int):
+	# TODO: Start round
 	round: Round = database.rounds.select_round(round_id)
 	database.events.select_event_for_round(round)
 	database.playlist_sets.select_playlist_set_for_round(round)
