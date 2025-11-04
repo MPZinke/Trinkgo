@@ -86,7 +86,7 @@ DROP TABLE IF EXISTS "PlayedSongsSets" CASCADE;
 CREATE TABLE "PlayedSongsSets"
 (
 	"id" SERIAL NOT NULL PRIMARY KEY,
-	"played_at" NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	"played_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	"Rounds.id" INT NOT NULL,
 	"SongsSets.id" INT NOT NULL,
 	FOREIGN KEY ("Rounds.id") REFERENCES "Rounds" ("id"),
@@ -101,7 +101,7 @@ CREATE TABLE "Cards"
 	"id" SERIAL NOT NULL PRIMARY KEY,
 	"identifier" VARCHAR(4) NOT NULL,
 	"size" INT[2] NOT NULL DEFAULT ARRAY[5, 5]::INT[2],
-	"PlayedSongsSets" INT DEFAULT NULL,
+	"PlayedSongsSets.id" INT DEFAULT NULL,
 	"Rounds.id" INT NOT NULL,
 	"is_deleted" BOOL NOT NULL DEFAULT FALSE,
 	FOREIGN KEY ("PlayedSongsSets.id") REFERENCES "PlayedSongsSets" ("id"),

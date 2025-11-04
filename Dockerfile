@@ -1,12 +1,10 @@
 FROM python:3.13-slim
 
 
-COPY ./source /usr/local/bin/trinkgo
-COPY ./requirements.txt /usr/local/bin/trinkgo/
-WORKDIR /usr/local/bin/trinkgo/
+COPY ./src ./src
+COPY ./pyproject.toml ./
 
+RUN pip3 install .
+RUN pip3 install gunicorn
 
-RUN pip3 install -r requirements.txt
-
-
-ENTRYPOINT ["python3", "/usr/local/bin/trinkgo"]
+ENTRYPOINT ["gunicorn", "-w", "4", "-b", "0.0.0.0:443", "trinkgo.webapp.router:app"]

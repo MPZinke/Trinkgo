@@ -1,0 +1,95 @@
+#!/opt/homebrew/bin/python3
+# -*- coding: utf-8 -*-
+__author__ = "MPZinke"
+
+########################################################################################################################
+#                                                                                                                      #
+#   created by: MPZinke                                                                                                #
+#   on 2025.10.20                                                                                                      #
+#                                                                                                                      #
+#   DESCRIPTION:                                                                                                       #
+#   BUGS:                                                                                                              #
+#   FUTURE:                                                                                                            #
+#                                                                                                                      #
+########################################################################################################################
+
+
+from datetime import date as date_type
+from io import BytesIO
+from pathlib import Path
+
+
+from flask import redirect, render_template, request, send_file, Blueprint
+from flask_login import login_required
+import requests
+
+
+from trinkgo import database
+from trinkgo import spotify
+from trinkgo.game.create_card import create_cards
+from trinkgo.game.classes import Card, Event, PlaylistSet, Round
+
+
+WEBAPP_DIRECTORY = Path(__file__).parents[3]
+HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
+STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
+
+
+cards_blueprint = Blueprint('cards_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+
+
+@cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards")
+@login_required
+def GET_events_event_rounds_round_cards(event_id: int, round_id: int):
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.cards.select_cards_for_round(round)
+
+	return render_template("events/event/rounds/round/cards.j2", round=round)
+
+
+@cards_blueprint.post("/events/<int:event_id>/rounds/<int:round_id>/cards/new")
+@login_required
+def POST_events_event_rounds_round_cards_new(event_id: int, round_id: int):
+	number_of_cards: int = int(request.form.get("number_of_cards-input"))
+
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.cards.select_cards_for_round(round)
+	database.cards.select_cards_songs(round.cards, round.playlist_set)
+
+	create_cards(round, number_of_cards)
+
+	return redirect(f"/events/{event_id}/rounds/{round_id}/cards")
+
+
+@cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/all")
+@login_required
+def GET_events_event_rounds_round_cards_all(event_id: int, round_id: int):
+	round: Round = database.rounds.select_round(round_id)
+	database.events.select_event_for_round(round)
+	database.playlist_sets.select_playlist_set_for_round(round)
+	database.set_songs.select_set_songs_for_playlist_set(round.playlist_set)
+	database.cards.select_cards_for_round(round)
+	database.cards.select_cards_songs(round.cards, round.playlist_set)
+
+	card_images = [card.image() for card in round.cards]
+	pdf = Card.pdf(card_images)
+	return send_file(pdf, download_name=f"{round.name}.pdf", mimetype="application/pdf")
+
+
+@cards_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/cards/<int:card_id>")
+@login_required
+def GET_events_event_rounds_round_cards_card(event_id: int, round_id: int, card_id: int):
+	card: Card = database.cards.select_card(card_id)
+	database.rounds.select_round_for_card(card)
+	database.events.select_event_for_round(card.round)
+	database.playlist_sets.select_playlist_set_for_round(card.round)
+	database.set_songs.select_set_songs_for_playlist_set(card.round.playlist_set)
+	database.cards.select_card_songs(card, card.round.playlist_set)
+
+	pdf: BytesIO = Card.pdf(card.image())
+	return send_file(pdf, download_name=f"{card.identifier}.pdf", mimetype="application/pdf")

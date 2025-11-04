@@ -1,0 +1,17 @@
+version: "3"
+services:
+  trinkgo:
+    container_name: trinkgo
+    image: docker.local:5000/trinkgo:1.0.0
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_HOST=${DB_HOST}
+      - DB_PASSWORD=${DB_PASSWORD}
+    expose:
+      - 80
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: "unless-stopped"
+    tty: true

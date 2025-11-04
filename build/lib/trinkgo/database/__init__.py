@@ -1,0 +1,17 @@
+#!/opt/homebrew/bin/python3
+# -*- coding: utf-8 -*-
+__author__ = "MPZinke"
+
+########################################################################################################################
+#                                                                                                                      #
+#   created by: MPZinke                                                                                                #
+#   on 2025.09.21                                                                                                      #
+#                                                                                                                      #
+#   DESCRIPTION:                                                                                                       #
+#   BUGS:                                                                                                              #
+#   FUTURE:                                                                                                            #
+#                                                                                                                      #
+########################################################################################################################
+
+
+from trinkgo.database import cards, events, played_set_songs, playlists, playlist_sets, rounds, set_songs, songs

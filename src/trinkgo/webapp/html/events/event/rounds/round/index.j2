@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<title>
+		{{ round.event.name }} - {{ round.name }}
+	</title>
+
+	<body>
+		<header>
+			<a
+				href="/"
+			>
+				⌂
+			</a>
+			&gt;
+			<a
+				href="/events"
+			>
+				Events
+			</a>
+			&gt;
+			<a
+				href="/events/{{ round.event.id }}"
+			>
+				{{ round.event.name }}
+			</a>
+			&gt;
+			<a
+				href="/events/{{ round.event.id }}/rounds"
+			>
+				Rounds
+			</a>
+			&gt; {{ round.name }}
+		</header>
+
+		<h1>
+			{{ round.event.name }} ({{ round.event.date }}) - {{ round.name }}
+		</h1>
+
+		<table>
+			<tr>
+				<td>
+					Playlist Set
+				</td>
+				<td>
+					<a
+						href="/playlists/{{ round.playlist_set.playlist.id }}/sets/{{ round.playlist_set.id }}"
+					>
+						{{ round.playlist_set.name }}
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Size
+				</td>
+				<td>
+					{{ round.size }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Started
+				</td>
+				<td>
+					{% if round.ended is false %}
+						<a
+							href="/events/{{ round.event.id }}/rounds/{{ round.id }}/play"
+						>
+							<button>
+								{% if round.start is none %}
+									Start
+								{% else %}
+									Continue
+								{% endif %}
+							</button>
+						</a>
+					{% else %}
+						{{ round.start }}
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				{% if round.ended is false %}
+					<td
+						colspan="2"
+					>
+						<form
+							method="POST"
+							action="/events/{{ round.event.id }}/rounds/{{ round.id }}/end"
+						>
+							<button>
+								End
+							</button>
+						</form>
+					</td>
+				{% else %}
+					<td>
+						Ended
+					</td>
+					<td>
+						{{ round.ended }}
+					</td>
+				{% endif %}
+			</tr>
+		</table>
+
+		<h2>
+			<a
+				href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards"
+			>
+				Cards ({{ round.cards | length }})
+			</a>
+		</h2>
+
+		<form
+			method="POST"
+			action="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/new"
+		>
+			<input
+				name="number_of_cards-input"
+				type="number"
+				min="1"
+			/>
+			<button>
+				+ Create Cards
+			</button>
+		</form>
+
+		<table>
+			{% for card in round.cards %}
+				<tr>
+					<td>
+						<a
+							href="/events/{{ round.event.id }}/rounds/{{ round.id }}/cards/{{ card.id }}"
+						>
+							{{ card.identifier }}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

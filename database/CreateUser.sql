@@ -1,0 +1,9 @@
+CREATE USER "trinkgo" WITH PASSWORD '';
+
+GRANT CONNECT
+ON DATABASE "trinkgo" 
+TO "trinkgo";
+
+GRANT CREATE, CONNECT
+ON DATABASE "trinkgo" 
+TO "trinkgo";
