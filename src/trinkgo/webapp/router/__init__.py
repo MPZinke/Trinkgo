@@ -30,11 +30,11 @@ import requests
 from trinkgo import database
 from trinkgo import spotify
 from trinkgo.spotify.classes import Playlist, Song
-from webapp.router.api import api_blueprint
-from webapp.router.auth import auth_blueprint, login_manager
-from webapp.router.events import events_blueprint
-from webapp.router.home import home_blueprint
-from webapp.router.playlists import playlists_blueprint
+from trinkgo.webapp.router.api import api_blueprint
+from trinkgo.webapp.router.auth import auth_blueprint, login_manager
+from trinkgo.webapp.router.events import events_blueprint
+from trinkgo.webapp.router.home import home_blueprint
+from trinkgo.webapp.router.playlists import playlists_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]

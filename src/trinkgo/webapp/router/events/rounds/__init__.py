@@ -27,8 +27,8 @@ from trinkgo import database
 from trinkgo import spotify
 from trinkgo.game.classes import Event, PlaylistSet, Round
 from trinkgo.game.create_card import create_cards
-from webapp.router.events.rounds.cards import cards_blueprint
-from webapp.router.events.rounds.play import play_blueprint
+from trinkgo.webapp.router.events.rounds.cards import cards_blueprint
+from trinkgo.webapp.router.events.rounds.play import play_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[3]

@@ -14,7 +14,7 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from webapp.router import app
+from trinkgo.webapp.router import app
 
 
 def main():

@@ -26,7 +26,7 @@ import requests
 from trinkgo import database
 from trinkgo import spotify
 from trinkgo.game.classes import Event, PlaylistSet, Round
-from webapp.router.events.rounds import rounds_blueprint
+from trinkgo.webapp.router.events.rounds import rounds_blueprint
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[2]
