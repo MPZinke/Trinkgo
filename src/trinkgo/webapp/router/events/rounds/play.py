@@ -14,9 +14,6 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from pathlib import Path
-
-
 from flask import redirect, render_template, Blueprint
 from flask_login import login_required
 import requests
@@ -26,17 +23,12 @@ from trinkgo import database
 from trinkgo.game.classes import Round
 
 
-WEBAPP_DIRECTORY = Path(__file__).parents[3]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-play_blueprint = Blueprint('play_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+play_blueprint = Blueprint('play_blueprint', __name__)
 
 
 @play_blueprint.get("/events/<int:event_id>/rounds/<int:round_id>/play")
 @login_required
-def GET_events_event_rounds_round_play(_event_id: int, round_id: int):
+def GET_events_event_rounds_round_play(event_id: int, round_id: int):
 	round: Round = database.rounds.select_round(round_id)
 
 	if(round.start is None):

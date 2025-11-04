@@ -18,10 +18,9 @@ from trinkgo.game.classes import Round, SetSong
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]
 HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
 
 
-api_blueprint = Blueprint('api_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+api_blueprint = Blueprint('api_blueprint', __name__)
 
 
 def render_template(template_path: str, **kwargs: dict) -> str:

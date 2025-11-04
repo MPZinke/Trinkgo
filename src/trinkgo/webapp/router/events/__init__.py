@@ -15,7 +15,6 @@ __author__ = "MPZinke"
 
 
 from datetime import date as date_type
-from pathlib import Path
 
 
 from flask import redirect, render_template, request, Blueprint
@@ -29,12 +28,7 @@ from trinkgo.game.classes import Event, PlaylistSet, Round
 from trinkgo.webapp.router.events.rounds import rounds_blueprint
 
 
-WEBAPP_DIRECTORY = Path(__file__).parents[2]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-events_blueprint = Blueprint('events_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+events_blueprint = Blueprint('events_blueprint', __name__)
 events_blueprint.register_blueprint(rounds_blueprint)
 
 

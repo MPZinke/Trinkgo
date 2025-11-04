@@ -14,24 +14,11 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
-from pathlib import Path
-
-
 from flask import render_template, Blueprint
-from flask_login import current_user, login_required
-import requests
+from flask_login import login_required
 
 
-from trinkgo import database
-from trinkgo import spotify
-
-
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-home_blueprint = Blueprint('home_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+home_blueprint = Blueprint('home_blueprint', __name__)
 
 
 @home_blueprint.get("/")

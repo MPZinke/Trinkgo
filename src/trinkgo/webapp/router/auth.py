@@ -16,7 +16,6 @@ __author__ = "MPZinke"
 
 from datetime import datetime, timedelta
 import json
-from pathlib import Path
 import urllib.parse
 
 
@@ -26,17 +25,11 @@ from flask_login import login_required
 import requests
 
 
-from trinkgo import database
 from trinkgo import spotify
 from trinkgo.spotify.auth import SpotifyUserAuth
 
 
-WEBAPP_DIRECTORY = Path(__file__).parents[1]
-HTML_DIRECTORY = WEBAPP_DIRECTORY / "html"
-STATIC_DIRECTORY = WEBAPP_DIRECTORY / "static"
-
-
-auth_blueprint = Blueprint('auth_blueprint', __name__, template_folder=HTML_DIRECTORY, static_folder=STATIC_DIRECTORY)
+auth_blueprint = Blueprint('auth_blueprint', __name__)
 
 
 login_manager = flask_login.LoginManager()
