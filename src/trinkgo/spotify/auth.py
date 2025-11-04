@@ -56,7 +56,6 @@ class SpotifyUserAuth:
 			self._expiration = datetime.now() + timedelta(seconds=auth_data.get("expires_in"))
 			flask_login.login_user(self)
 
-		print(self._access_token)
 		return self._access_token
 
 

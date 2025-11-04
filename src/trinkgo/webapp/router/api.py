@@ -12,8 +12,8 @@ import requests
 
 from trinkgo import database
 from trinkgo import spotify
-from trinkgo.spotify.classes import Playlist, Song
 from trinkgo.game.classes import Round, SetSong
+from trinkgo.spotify.classes import Playlist, Song
 
 
 WEBAPP_DIRECTORY = Path(__file__).parents[1]

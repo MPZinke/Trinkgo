@@ -56,7 +56,6 @@ def unauthorized():
 
 @auth_blueprint.get('/login')
 def GET_login():
-	print(request.environ)
 	return render_template("login.j2")
 
 

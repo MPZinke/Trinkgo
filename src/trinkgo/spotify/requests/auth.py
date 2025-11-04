@@ -32,8 +32,6 @@ def get_access_token(code: str, protocol_and_netloc: str):
 	}
 	response = requests.post(url, headers=headers, params=params)
 
-	print(response.json())  # TEMP
-
 	return response.json()
 
 
