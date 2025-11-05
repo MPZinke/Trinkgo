@@ -24,6 +24,9 @@ from trinkgo.game.classes import Card, CardSetSongs, Round, SetSong
 
 
 def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[SetSong]:
+	if(len(songs) < length):
+		repeat = True
+
 	card_songs = []
 	while(len(card_songs) < length):
 		random_index = randint(0, len(songs)-1)
@@ -38,7 +41,7 @@ def random_songs(songs: list[Song], length: int, repeat: bool=False) -> list[Set
 # TODO: Round type (cross out, black out, etc)
 # TODO: Add card win detection
 def create_card(round: Round, freespot: bool=True, repeat: bool=False):
-	songs: list[SetSong] = random_songs(round.playlist_set.set_songs, round.size[0]*round.size[1] - int(freespot))
+	songs: list[SetSong] = random_songs(round.playlist_set.set_songs, round.size[0]*round.size[1] - int(freespot), repeat)
 	card_songs = CardSetSongs(round.size)
 	for row in range(round.size[0]):
 		for column in range(round.size[1]):
@@ -59,7 +62,7 @@ def create_card(round: Round, freespot: bool=True, repeat: bool=False):
 def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat: bool=False) -> bool:
 	cards: list[Card] = []
 
-	for x in range(number_of_cards):
+	for _ in range(number_of_cards):
 		while((card := create_card(round, freespot, repeat)) in cards or card in round.cards):
 			...
 

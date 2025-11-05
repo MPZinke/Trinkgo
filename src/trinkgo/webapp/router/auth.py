@@ -16,6 +16,7 @@ __author__ = "MPZinke"
 
 from datetime import datetime, timedelta
 import json
+import os
 import urllib.parse
 
 
@@ -35,6 +36,9 @@ auth_blueprint = Blueprint('auth_blueprint', __name__)
 login_manager = flask_login.LoginManager()
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
+
+
+PROTOCOL = os.getenv("PROTOCOL", "https")
 
 
 @login_manager.user_loader
@@ -70,13 +74,12 @@ def POST_login():
 		return render_template("login.j2", unauthorized=True)
 
 	url = urllib.parse.urlparse(request.url)
-
 	params = {
 		"response_type": "code",
 		"client_id": "8dc7f8b757934d9ebaf39f9347bccc56",
 		"scope": "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
 		"state": "",
-		"redirect_uri": f"""{url.scheme}://{url.netloc}/authenticated""",
+		"redirect_uri": f"""{PROTOCOL}://{url.netloc}/authenticated""",
 	}
 	param_string = urllib.parse.urlencode(params)
 
@@ -90,7 +93,7 @@ def authenticated():
 		raise Exception("URL parameter `code` is missing.")
 
 	url = urllib.parse.urlparse(request.url)
-	auth_data: dict = spotify.requests.auth.get_access_token(code, f"{url.scheme}://{url.netloc}")
+	auth_data: dict = spotify.requests.auth.get_access_token(code, f"{PROTOCOL}://{url.netloc}")
 	user = SpotifyUserAuth(
 		access_token=auth_data["access_token"],
 		code=code,
