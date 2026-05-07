@@ -22,7 +22,7 @@ def get_access_token(code: str, protocol_and_netloc: str):
 	#    @: Request Access Token
 	url = "https://accounts.spotify.com/api/token"
 	headers = {
-		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+		"Authorization": "Basic <client_id:client_secret>::base64",
 		"Content-Type": "application/x-www-form-urlencoded",
 	}
 	params = {
@@ -40,7 +40,7 @@ def refresh_access_token(refresh_token: str):
 	url = "https://accounts.spotify.com/api/token"
 	headers = {
 		"Content-Type": "application/x-www-form-urlencoded",
-		"Authorization": "Basic OGRjN2Y4Yjc1NzkzNGQ5ZWJhZjM5ZjkzNDdiY2NjNTY6N2U5YzQyMTI3OWI3NGQ2OWE2YTliNTBlNDkzY2ZhOGU=",
+		"Authorization": "Basic <client_id:client_secret>::base64",
 	}
 	params = {
 		"grant_type": "refresh_token",

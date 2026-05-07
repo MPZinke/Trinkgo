@@ -24,7 +24,7 @@ def connect(function: callable) -> callable:
 		password: str = os.getenv("DB_PASSWORD")
 		ssl_mode: str = os.getenv("DB_SSL_MODE", "require")
 
-		connection_string = f"host='{host}' port='{port}' dbname=trinkgo user='{user}' password='{password}' sslmode='{ssl_mode}'"
+		connection_string = f"host='{host}' port='{port}' dbname=Trinkgo user='{user}' password='{password}' sslmode='{ssl_mode}'"
 		with psycopg2.connect(connection_string) as connection:
 			connection.autocommit = True  # Automatically commit changes to DB
 			with connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:

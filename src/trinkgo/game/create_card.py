@@ -63,6 +63,7 @@ def create_cards(round: Round, number_of_cards: int, freespot: bool=True, repeat
 	cards: list[Card] = []
 
 	for _ in range(number_of_cards):
+		# TODO: force repeat check
 		while((card := create_card(round, freespot, repeat)) in cards or card in round.cards):
 			...
 
