@@ -66,30 +66,5 @@
 {% include("player.j2") %}
 
 <script>
-	async function set_button_and_play_song(button, id)
-	{
-		button.disabled = true;
-
-		let on_play = () =>
-		{
-			button.innerHTML = "Pause";
-			button.onclick = async () => await PLAYER.pause();
-			button.disabled = false;
-		}
-
-		let on_pause = () =>
-		{
-			button.innerHTML = "Play";
-			button.onclick = async () => set_button_and_play_song(button, id);
-		}
-
-		try
-		{
-			await PLAYER.play_song(id, on_play, on_pause);
-		}
-		catch(error)
-		{
-			alert(error);
-		}
-	}
+	{% include "playlists/playlist/index.js" with context %}
 </script>

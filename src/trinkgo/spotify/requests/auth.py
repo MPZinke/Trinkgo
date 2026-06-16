@@ -19,7 +19,7 @@ import os
 import requests
 
 
-BASIC_AUTH = base64.b64encode(f"{os.environ["CLIENT_ID"]}:{os.environ["CLIENT_SECRET"]}".encode())
+BASIC_AUTH = base64.b64encode(f"{os.environ["CLIENT_ID"]}:{os.environ["CLIENT_SECRET"]}".encode()).decode()
 
 
 def get_access_token(code: str, protocol_and_netloc: str):

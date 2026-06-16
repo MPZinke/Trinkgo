@@ -78,12 +78,11 @@ def POST_login():
 	url = urllib.parse.urlparse(request.url)
 	params = {
 		"response_type": "code",
-		"client_id": os.getenv("CLIENT_ID"),
+		"client_id": os.environ["CLIENT_ID"],
 		"scope": "user-modify-playback-state app-remote-control streaming user-top-read user-read-email user-read-private",
 		"state": "".join(random.choices(string.ascii_letters + string.digits, k=16)),
 		"redirect_uri": f"""{PROTOCOL}://{url.netloc}/authenticated""",
 	}
-	print(params)
 	param_string = urllib.parse.urlencode(params)
 
 	return redirect(f"https://accounts.spotify.com/authorize?{param_string}")

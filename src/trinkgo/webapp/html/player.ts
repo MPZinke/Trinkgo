@@ -175,7 +175,13 @@ class Player
 	}
 
 
-	async play_set_song(set_song_id: number, on_play=() => {}, on_pause=() => {}, start=null, duration=null)
+	async play_set_song(
+		set_song_id: number,
+		on_play=() => {},
+		on_pause=() => {},
+		start: number|null=null,
+		duration: number|null=null
+	)
 	{
 		await this.pause();
 
