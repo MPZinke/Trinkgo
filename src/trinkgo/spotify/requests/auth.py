@@ -14,7 +14,12 @@ __author__ = "MPZinke"
 ########################################################################################################################
 
 
+import base64
+import os
 import requests
+
+
+BASIC_AUTH = base64.b64encode(f"{os.environ["CLIENT_ID"]}:{os.environ["CLIENT_SECRET"]}".encode())
 
 
 def get_access_token(code: str, protocol_and_netloc: str):
@@ -22,7 +27,7 @@ def get_access_token(code: str, protocol_and_netloc: str):
 	#    @: Request Access Token
 	url = "https://accounts.spotify.com/api/token"
 	headers = {
-		"Authorization": "Basic <client_id:client_secret>::base64",
+		"Authorization": f"Basic {BASIC_AUTH}",
 		"Content-Type": "application/x-www-form-urlencoded",
 	}
 	params = {
@@ -40,7 +45,7 @@ def refresh_access_token(refresh_token: str):
 	url = "https://accounts.spotify.com/api/token"
 	headers = {
 		"Content-Type": "application/x-www-form-urlencoded",
-		"Authorization": "Basic <client_id:client_secret>::base64",
+		"Authorization": f"Basic {BASIC_AUTH}",
 	}
 	params = {
 		"grant_type": "refresh_token",
